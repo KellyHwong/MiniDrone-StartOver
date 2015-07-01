@@ -15,6 +15,10 @@
 // 系统时钟168MHz时，TIM2~7时钟频率84MHz（168/4*2）
 // 计数预分频84，则计数频率1MHz，1uS计一次
 
+// 挂载在APB2上，APB2默认分频2
+#define PRESCALER_APB2 (168-1)
+// 168/2*2 = 168
+
 #define PERIOD (0xFFFFFFFF) // 32/16位，兼容各个计时器
 
 Timer::Timer(uint8_t TIM_No) {
@@ -55,6 +59,8 @@ void Timer::mode_pwm_input(PinTypedef p) {
   // 时钟预分频
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructrue; // 计时器分频初始化器
   TIM_TimeBaseStructrue.TIM_Prescaler = PRESCALER;
+  if ((this->TIM_No==1) || (this->TIM_No==8))
+    TIM_TimeBaseStructrue.TIM_Prescaler = PRESCALER_APB2;
   TIM_TimeBaseStructrue.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseStructrue.TIM_Period = PERIOD;
   TIM_TimeBaseStructrue.TIM_ClockDivision = TIM_CKD_DIV1;
@@ -81,7 +87,10 @@ void Timer::mode_pwm_input(PinTypedef p) {
   TIM_Cmd(this->TIM, ENABLE); // run TIM5
   // 设置中断ISR为PWM Input模式中断
   // this->set_IRQHandler(Timer::PWM_Input_Handler_Dispatch);
-  TIM_ITConfig(this->TIM, TIM_IT_CC2, ENABLE); // 打开中断，TIM_IT_Update不要
+  if ((TIM_No==1)||(TIM_No==8))
+    TIM_ITConfig(this->TIM, TIM_IT_Update, ENABLE); // 打开中断，不要
+  else
+    TIM_ITConfig(this->TIM, TIM_IT_CC2, ENABLE); // 打开中断，TIM_IT_Update不要
 }
 
 // 计算引脚复用地址
@@ -110,6 +119,9 @@ void Timer::config_IRQn(void) {
     case (5): {this->IRQn = TIM5_IRQn; break;}
     
     case (7): {this->IRQn = TIM7_IRQn; break;}
+    
+    //
+    case (1): {this->IRQn = TIM1_CC_IRQn; break;}
   }
 }
 

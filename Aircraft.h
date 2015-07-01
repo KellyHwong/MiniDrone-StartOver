@@ -5,10 +5,10 @@
 #endif 
  
 void Aircraft_Init(void);
-void TIM1_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
 void TIM4_IRQHandler(void);
+void TIM5_IRQHandler(void);
    
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
-#ifndef STICK_H_
-#define STICK_H_
+#ifndef PWM_H_
+#define PWM_H_
 
 #ifdef __cplusplus
  extern "C" {

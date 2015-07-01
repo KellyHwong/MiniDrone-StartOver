@@ -14,15 +14,15 @@
 
 // 宏定义
 // 信号接收定时器，引脚
-#define THROTTLE_TIM 1
-#define PITCH_TIM    2
-#define YAW_TIM      3
-#define ROLL_TIM     4
-#define THROTTLE_PIN PA9
-#define PITCH_PIN    PB3
-#define YAW_PIN      PC7
-#define ROLL_PIN     PD13
-
+#define THROTTLE_TIM 2
+#define PITCH_TIM    3
+#define YAW_TIM      4
+#define ROLL_TIM     5
+#define THROTTLE_PIN PB3
+#define PITCH_PIN    PC7
+#define YAW_PIN      PD13
+#define ROLL_PIN     PA1
+#define PWM_TIM     1
 // 三个通道捕获计时器
 Timer tim_throttle(THROTTLE_TIM); // ch3
 Timer tim_pitch(PITCH_TIM); // ch1
@@ -76,7 +76,7 @@ void Aircraft_Init(void) {
   tim_roll.mode_pwm_input(ROLL_PIN);
 }
 
-void TIM1_IRQHandler(void) {
+void TIM2_IRQHandler(void) {
   tim_throttle.PWM_Input_Handler();
   uint8_t tmp2[80];
   float_to_string(tim_throttle.DutyCycle,tmp2);
@@ -84,7 +84,7 @@ void TIM1_IRQHandler(void) {
   GUI_Text(0,0,tmp1,White,Blue);
   GUI_Text(0,LCD_LINE_SPACE,tmp2,White,Blue);
 }
-void TIM2_IRQHandler(void) {
+void TIM3_IRQHandler(void) {
   tim_pitch.PWM_Input_Handler();
   uint8_t tmp2[80];
   float_to_string(tim_pitch.DutyCycle,tmp2);
@@ -92,7 +92,7 @@ void TIM2_IRQHandler(void) {
   GUI_Text(0,2*LCD_LINE_SPACE,tmp1,White,Blue);
   GUI_Text(0,3*LCD_LINE_SPACE,tmp2,White,Blue);
 }
-void TIM3_IRQHandler(void) {
+void TIM4_IRQHandler(void) {
   tim_yaw.PWM_Input_Handler();
   uint8_t tmp2[80];
   float_to_string(tim_yaw.DutyCycle,tmp2);
@@ -100,7 +100,7 @@ void TIM3_IRQHandler(void) {
   GUI_Text(0,4*LCD_LINE_SPACE,tmp1,White,Blue);
   GUI_Text(0,5*LCD_LINE_SPACE,tmp2,White,Blue);
 }
-void TIM4_IRQHandler(void) {
+void TIM5_IRQHandler(void) {
   tim_roll.PWM_Input_Handler();
   uint8_t tmp2[80];
   float_to_string(tim_roll.DutyCycle,tmp2);

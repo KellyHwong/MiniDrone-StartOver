@@ -409,29 +409,14 @@
           <GroupName>Root</GroupName>
           <Files>
             <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\stm32f4xx_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>TIM5_PWM_Cap.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\TIM5_PWM_Cap.c</FilePath>
-            </File>
-            <File>
-              <FileName>Formatter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Formatter.c</FilePath>
-            </File>
-            <File>
-              <FileName>interrupts.cpp</FileName>
+              <FileName>Aircraft.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\interrupts.cpp</FilePath>
+              <FilePath>.\Aircraft.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\stm32f4xx_it.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -504,9 +489,54 @@
           <GroupName>CMSIS</GroupName>
           <Files>
             <File>
-              <FileName>system_stm32f4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\system_stm32f4xx.c</FilePath>
+              <FileName>system_stm32f4xx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\system_stm32f4xx.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>Pin.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Drivers\Pin.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Drivers\Timer.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Utilities</GroupName>
+          <Files>
+            <File>
+              <FileName>LCD.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Utilities\LCD.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>AsciiLib.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Utilities\AsciiLib.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Misc</GroupName>
+          <Files>
+            <File>
+              <FileName>Delay.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Misc\Delay.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Formatter.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Misc\Formatter.cpp</FilePath>
             </File>
           </Files>
         </Group>
