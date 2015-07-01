@@ -1,5 +1,5 @@
-#ifndef PWM_H_
-#define PWM_H_
+#ifndef MOTOR_H_
+#define MOTOR_H_
 
 #ifdef __cplusplus
  extern "C" {
@@ -12,22 +12,24 @@
 
 #include "Drivers/Timer.h"
 #include "Drivers/Pin.h"
+#include "Drivers/PWM.h"
 #include "Misc/Formatter.h"
 #include "Utilities/LCD.h"
+   
+#define MAX_DUTY 0.10
+#define MIN_DUTY 0.05
 
-class PWM {
+class Motor {
  private:
+  PWM pwm_;
   float duty_;
-  uint32_t freq_;
-  Timer tim_;
-  uint8_t CH_No_;
-  PinTypedef pin_;
+  float duty_limit(float duty);
  public:
-  PWM();
-  PWM(uint32_t freq, float duty, uint8_t TIM_No, uint8_t CH_No,PinTypedef pin);
+  Motor();
+  Motor(PWM pwm);
   void set_duty(float duty);
   float get_duty(void);
-}; // class Stick
+}; // class Motor
 
 #ifdef __cplusplus
 }

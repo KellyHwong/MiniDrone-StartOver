@@ -23,6 +23,18 @@ void Pin::mode_pwm_input(uint8_t GPIO_AF_TIM) {
   GPIO_PinAFConfig(this->GPIO_, this->GPIO_PinSource_, GPIO_AF_TIM); // PA0复用TIM5
 }
 
+// PWM输出通道模式，参数：复用设置
+void Pin::mode_pwm_output(uint8_t GPIO_AF_TIM) {
+  GPIO_InitTypeDef GPIO_InitStructure; // GPIO初始化器
+  GPIO_InitStructure.GPIO_Pin = this->GPIO_Pin_; //
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; //
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz; //
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP; // 推挽输出
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL; // 下拉
+  GPIO_Init(this->GPIO_, &GPIO_InitStructure);
+  GPIO_PinAFConfig(this->GPIO_, this->GPIO_PinSource_, GPIO_AF_TIM); // PA0复用TIM5
+}
+
 // 根据PXX计算属性
 void Pin::eval_properties(PinTypedef pin) {
   this->GPIO_PinSource_ = pin % 16;

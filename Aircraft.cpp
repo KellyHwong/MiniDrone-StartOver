@@ -8,51 +8,65 @@
 #include "Misc/Formatter.h"
 #include "Misc/Delay.h"
 #include "Utilities/LCD.h"
+#include "Utilities/Motor.h"
 //#include "Utilities/Motor.h"
 //#include "Utilities/Receiver.h"
 //#include "Utilities/Stick.h"
-
+#define DELAY_1S 300000
+#define PWM_FREQ 50
 // 宏定义
 // 信号接收定时器，引脚
 #define THROTTLE_TIM 2
 #define PITCH_TIM    3
 #define YAW_TIM      4
 #define ROLL_TIM     5
+#define SCH_TIM      8
+#define MOTOR1_PWM_TIM 9
+#define MOTOR2_PWM_TIM 9
+#define MOTOR3_PWM_TIM 10
+#define MOTOR4_PWM_TIM 11
 #define THROTTLE_PIN PB3
 #define PITCH_PIN    PC7
 #define YAW_PIN      PD13
 #define ROLL_PIN     PA1
-#define PWM_TIM     1
+
+#define MOTOR1_PWM_CH  1
+#define MOTOR1_PWM_PIN  PA2
+
+#define MOTOR2_PWM_CH  2
+#define MOTOR2_PWM_PIN  PA3
+
+#define MOTOR3_PWM_CH  1
+#define MOTOR3_PWM_PIN  PB8
+
+#define MOTOR4_PWM_CH  1
+#define MOTOR4_PWM_PIN  PB9
+
 // 三个通道捕获计时器
 Timer tim_throttle(THROTTLE_TIM); // ch3
 Timer tim_pitch(PITCH_TIM); // ch1
 Timer tim_yaw(YAW_TIM); // ch2
 Timer tim_roll(ROLL_TIM);
-/*
 // Motors
-Motor motor1(PWM(50,0.05,9,1));
-Motor motor2(PWM(50,0.05,9,2));
-Motor motor3(PWM(50,0.05,10,1));
-Motor motor4(PWM(50,0.05,11,1));
+Motor motor1;
+Motor motor2;
+Motor motor3;
+Motor motor4;
 // 调度器
-Timer tim_sch();
+Timer tim_sch(SCH_TIM);
 // 通道捕获器和解释器
-Receiver receiver; 
-receiver.stick_throttle = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
-receiver.stick_pitch = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
-receiver.stick_roll = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
-receiver.stick_yaw = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
-*/
+//Receiver receiver; 
+//receiver.stick_throttle = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
+//receiver.stick_pitch = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
+//receiver.stick_roll = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
+//receiver.stick_yaw = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
+
 int main(void)
 {
   Aircraft_Init();
-  uint8_t str_let[] = "Let the hunt begin.";
-  GUI_Text(0,0,str_let,White,Blue);
   while (1)
   {
-
 	}
-  
   return -1;
 }
 
@@ -69,13 +83,28 @@ void Aircraft_Init(void) {
   GPIO_ResetBits(GPIOD , GPIO_Pin_7);    //CS=0;
   LCD_Initializtion();
   LCD_Clear(Blue);
-  // Capturers
+  // 捕获器
   tim_throttle.mode_pwm_input(THROTTLE_PIN);
   tim_pitch.mode_pwm_input(PITCH_PIN);
   tim_yaw.mode_pwm_input(YAW_PIN);
   tim_roll.mode_pwm_input(ROLL_PIN);
+  // 一开始就设置为最大占空比
+  motor1 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN));
+  motor2 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN));
+  motor3 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN));
+  motor4 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN));
+  Delay(DELAY_1S); // 延时约1S
+  // 设为最低占空比，电机就绪
+  motor1.set_duty(MIN_DUTY);
+  motor2.set_duty(MIN_DUTY);
+  motor3.set_duty(MIN_DUTY);
+  motor4.set_duty(MIN_DUTY);
 }
 
+// TODO 调度器
+// void TIMx_IRQHandler(void) {}
+
+// 接收机PWM占空比通过4个20mS中断读取
 void TIM2_IRQHandler(void) {
   tim_throttle.PWM_Input_Handler();
   uint8_t tmp2[80];
@@ -108,6 +137,7 @@ void TIM5_IRQHandler(void) {
   GUI_Text(0,6*LCD_LINE_SPACE,tmp1,White,Blue);
   GUI_Text(0,7*LCD_LINE_SPACE,tmp2,White,Blue);
 }  
+void TIM8_UP_TIM13_IRQHandler(void) {}
 
 #ifdef  USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line)

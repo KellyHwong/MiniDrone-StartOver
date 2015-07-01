@@ -174,6 +174,7 @@ class Pin {
  public:
   Pin(PinTypedef pin);
   void mode_pwm_input(uint8_t GPIO_AF_TIM);
+  void mode_pwm_output(uint8_t GPIO_AF_TIM);
 }; // class Pin
 
 #endif
