@@ -15,6 +15,12 @@
 #ifndef __GLCD_H 
 #define __GLCD_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif 
+ 
+
+
 /* Includes ------------------------------------------------------------------*/
 #include <math.h>
 #include "stm32f4xx.h"
@@ -118,7 +124,11 @@ __inline void LCD_WriteReg(uint16_t LCD_Reg,uint16_t LCD_RegValue);
 static void LCD_SetCursor( uint16_t Xpos, uint16_t Ypos );
 void delay_ms(uint16_t ms);
 
-#endif 
+#ifdef __cplusplus
+}
+#endif
+
+#endif
 
 /*********************************************************************************************************
       END FILE

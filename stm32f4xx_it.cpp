@@ -150,21 +150,4 @@ void USARTx_IRQHANDLER(void)
 {
 }
 
-/**
-  * @brief  This function handles PPP interrupt request.
-  * @param  None
-  * @retval None
-  */
-/*void PPP_IRQHandler(void)
-{
-}*/
-
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */ 
-
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

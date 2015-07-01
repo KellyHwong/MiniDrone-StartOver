@@ -2,7 +2,7 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "misc.h"
-#include "Pin.h"
+#include "Drivers/Pin.h"
 
 Pin::Pin(PinTypedef pin) {
   this->eval_properties(pin); // 计算各个成员的值

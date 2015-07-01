@@ -31,7 +31,7 @@ Timer::Timer(uint8_t TIM_No) {
   };
   this->config_IRQn();
   this->config_Periph();
-  this->pFnIRQHandler = 0;
+  //this->pFnIRQHandler = 0;
   this->Frequency = 0;
   this->DutyCycle = 0;
 }
@@ -40,7 +40,9 @@ Timer::Timer(uint8_t TIM_No) {
 // eg: TIM5, CH2, 捕获PA1
 void Timer::mode_pwm_input(PinTypedef p) {
   Pin pin(p); // 函数调用后变量就消失了
-  pin.mode_pwm_input(this->GPIO_AF_TIM(this->TIM));
+  uint8_t tmp = this->GPIO_AF_TIM(this->TIM);
+  // 看看tmp有没有问题
+  pin.mode_pwm_input(tmp);
 
   NVIC_InitTypeDef NVIC_InitStructure;  // 中断初始化器
   NVIC_InitStructure.NVIC_IRQChannel = this->IRQn;
@@ -78,7 +80,7 @@ void Timer::mode_pwm_input(PinTypedef p) {
 
   TIM_Cmd(this->TIM, ENABLE); // run TIM5
   // 设置中断ISR为PWM Input模式中断
-  this->set_IRQHandler(Timer::PWM_Input_Handler_Dispatch);
+  // this->set_IRQHandler(Timer::PWM_Input_Handler_Dispatch);
   TIM_ITConfig(this->TIM, TIM_IT_CC2, ENABLE); // 打开中断，TIM_IT_Update不要
 }
 
@@ -94,6 +96,7 @@ uint8_t Timer::GPIO_AF_TIM(TIM_TypeDef * TIM) {
     case (9): return GPIO_AF_TIM9;
     case (10): return GPIO_AF_TIM10;
     case (11): return GPIO_AF_TIM11;
+    default: return 0xFF; // 错误输入，待处理
   }
 }
 
@@ -147,25 +150,18 @@ void Timer::mode_pwm_output(void) {
 
 }
 
-void Timer::set_IRQHandler(void (Timer::*pFunction)(Timer * tim)) {
+/* void Timer::set_IRQHandler(void (Timer::*pFunction)(Timer * tim)) {
   pFnIRQHandler = pFunction;
-}
+} */
 
 // PWM Input模式的中断处理函数
 void Timer::PWM_Input_Handler(void) {
-  uint8_t duty_str[80];
-  uint8_t freq_str[80];
-  uint32_t CCR2_Val;
+  uint32_t IC2Value;
   TIM_ClearITPendingBit(TIM, TIM_IT_CC2); //
-  CCR2_Val = TIM_GetCapture2(TIM);
-  if (CCR2_Val!=0) {
-    DutyCycle= (TIM_GetCapture1(TIM) * 100.0) / CCR2_Val;
-    Frequency= 1000000.0 / CCR2_Val;
-    float_to_string(DutyCycle, duty_str);
-    float_to_string(Frequency, freq_str);
-    //LCD_Clear(Blue);
-    GUI_Text(0,LCD_LINE_SPACE,duty_str,White,Blue);
-    GUI_Text(0,2*LCD_LINE_SPACE,freq_str,White,Blue);
+  IC2Value = TIM_GetCapture2(TIM);
+  if (IC2Value!=0) {
+    DutyCycle= (TIM_GetCapture1(TIM) * 100.0) / IC2Value;
+    Frequency= 1000000.0 / IC2Value;   
   }
   else {
     DutyCycle= 0;
@@ -173,6 +169,6 @@ void Timer::PWM_Input_Handler(void) {
   }
 }
 
-void Timer::PWM_Input_Handler_Dispatch(Timer * tim) {
+/* void Timer::PWM_Input_Handler_Dispatch(Timer * tim) {
   tim->PWM_Input_Handler();
-}
+} */

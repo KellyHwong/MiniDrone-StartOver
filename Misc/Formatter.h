@@ -1,5 +1,10 @@
 #ifndef FORMATTER_H_
 #define FORMATTER_H_
+#ifdef __cplusplus
+ extern "C" {
+#endif 
+ 
+
 
 #include <stdint.h>
 
@@ -12,5 +17,9 @@ void int_to_string(uint32_t a, uint8_t* str);
 void int_to_string_w(uint32_t a, uint8_t w, uint8_t* str);
 void float_to_string(float f, uint8_t* str);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
