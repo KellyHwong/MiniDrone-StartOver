@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "Formatter.h"
+#include "Misc/Formatter.h"
 
 // 翻转字符串
 // @param: 字符串和字符串实际长度
@@ -87,6 +87,7 @@ void float_to_string(float f, uint8_t* str) {
   int_to_string(a_int,str_int);
   int_to_string_w(a_frac,3,str_frac);
   
-  str_cat(str_int, ".", tmp);
+  uint8_t dot_str[] = ".";
+  str_cat(str_int, dot_str, tmp);
   str_cat(tmp, str_frac, str);
 }

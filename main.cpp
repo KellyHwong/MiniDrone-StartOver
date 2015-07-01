@@ -16,7 +16,8 @@ Timer tim5(5);
 int main(void)
 {
   APP_Init();
-  GUI_Text(0,0,"Let the hunt begin.",White,Blue);
+  uint8_t str_let[] = "Let the hunt begin.";
+  GUI_Text(0,0,str_let,White,Blue);
   while (1)
   {
 

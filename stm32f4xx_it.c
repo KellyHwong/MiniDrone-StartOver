@@ -23,9 +23,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
-#include "usart.h"
 
-#define USARTx_IRQHANDLER   USART1_IRQHandler
 /** @addtogroup STM32F4xx_StdPeriph_Examples
   * @{
   */
@@ -150,11 +148,6 @@ void SysTick_Handler(void)
 /******************************************************************************/
 void USARTx_IRQHANDLER(void)
 {
-  if(USART_GetITStatus(Open207V_USART, USART_IT_RXNE) != RESET)
-  { 
-  		//USART_ClearITPendingBit(USART2,USART_IT_RXNE);
-		printf("\n\rUSART Hyperterminal Interrupts Receive a word: %c\n\r",USART_ReceiveData(Open207V_USART));
-  }
 }
 
 /**

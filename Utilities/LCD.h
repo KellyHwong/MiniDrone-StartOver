@@ -19,7 +19,7 @@
 #include <math.h>
 #include "stm32f4xx.h"
 #include "config.h"
-#include "LCD/AsciiLib.h" 
+#include "Utilities/AsciiLib.h" 
 
 // defined by Kelly
 #define LCD_LINE_SPACE 16

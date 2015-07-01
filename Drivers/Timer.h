@@ -11,35 +11,33 @@
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_gpio.h"
 #include "misc.h"
-#include "Pin.h"
-
-typedef enum {
-  MODE_PWM_INPUT;
-  MODE_PWM_OUTPUT;
-} Timer_ModeTypedef;
+#include "Drivers/Pin.h"
 
 class Timer {
  private:
+  // Datas
+  uint8_t TIM_No;
   TIM_TypeDef * TIM; // eg: TIM5
-  Timer_ModeTypedef Timer_Mode;
-  // RCC
-  uint32_t RCC_Periph_TIM;
-  GPIO_InitTypeDef GPIO_InitStructure; // GPIO初始化器
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructrue; // 计时器分频初始化器
-  TIM_ICInitTypeDef TIM_ICInitStructure; // 计时器模块初始化器
-  NVIC_InitTypeDef NVIC_InitStructure;  // 中断初始化器
-
-  uint32_t RCC_Periph_TIM;
-  uint32_t RCC_Periph_GPIO;
-  // GPIO
-  Pin pin();
-  // NVIC
-  IRQn; // eg: TIM5_IRQn
-  // TIM_ICInitStructure
-  // uint16_t TIM_Channel; //eg: TIM_Channel_2
+  uint32_t RCC_Periph_TIM; // RCC
+  IRQn_Type IRQn; // NVIC, eg: TIM5_IRQn
+  // Funcs
+  uint8_t GPIO_AF_TIM(TIM_TypeDef * TIM);
+  void config_IRQn(void);
+  void config_Periph(void);
+  inline void PWM_Input_Handler(void);
  public:
+  // Datas
+  void (Timer::*pFnIRQHandler)(Timer * tim); // IRQHandler
+  // PWM Input params
+  float DutyCycle;
+  float Frequency;
+  // Funcs
   // eg: Timer(TIM5, MODE_PWM_INPUT);
-  Timer(TIM_TypeDef * TIM, Timer_ModeTypedef Timer_Mode);
+  Timer(uint8_t TIM_No);
+  void mode_pwm_input(PinTypedef p);
+  void mode_pwm_output(void);
+  static void PWM_Input_Handler_Dispatch(Timer * tim);
+  void set_IRQHandler(void (Timer::*pFunction)(Timer * tim));
 }; // class Timer
 
 #endif
