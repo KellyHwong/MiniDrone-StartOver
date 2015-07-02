@@ -3,16 +3,18 @@
 #include <stdint.h>
 #include "stm32f4xx.h"
 #include "misc.h"
+#include "stm32f4_discovery.h"
 
 #include "Drivers/Timer.h"
 #include "Misc/Formatter.h"
 #include "Misc/Delay.h"
-#include "Utilities/LCD.h"
+//#include "Utilities/LCD.h"
 #include "Utilities/Motor.h"
+#include "Utilities/Receiver.h"
 //#include "Utilities/Motor.h"
 //#include "Utilities/Receiver.h"
 //#include "Utilities/Stick.h"
-#define DELAY_1S 300000
+#define DELAY_1S 40000000
 #define PWM_FREQ 50
 // 宏定义
 // 信号接收定时器，引脚
@@ -55,8 +57,7 @@ Motor motor4;
 // 调度器
 Timer tim_sch(SCH_TIM);
 // 通道捕获器和解释器
-//Receiver receiver; 
-//receiver.stick_throttle = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
+Receiver receiver; 
 //receiver.stick_pitch = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
 //receiver.stick_roll = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
 //receiver.stick_yaw = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
@@ -66,13 +67,17 @@ int main(void)
   Aircraft_Init();
   while (1)
   {
+    Delay(DELAY_1S);
+    GPIO_ToggleBits(LED4_GPIO_PORT, LED4_PIN);
 	}
   return -1;
 }
 
+uint8_t init_flag = 0;
 void Aircraft_Init(void) {
-  // LCD
   GPIO_InitTypeDef  GPIO_InitStructure;
+  // LCD
+  /*
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -82,62 +87,105 @@ void Aircraft_Init(void) {
   GPIO_Init(GPIOD, &GPIO_InitStructure);
   GPIO_ResetBits(GPIOD , GPIO_Pin_7);    //CS=0;
   LCD_Initializtion();
-  LCD_Clear(Blue);
+  LCD_Clear(Blue);*/
   // 捕获器
   tim_throttle.mode_pwm_input(THROTTLE_PIN);
   tim_pitch.mode_pwm_input(PITCH_PIN);
   tim_yaw.mode_pwm_input(YAW_PIN);
   tim_roll.mode_pwm_input(ROLL_PIN);
-  // 一开始就设置为最大占空比
-  motor1 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN));
-  motor2 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN));
-  motor3 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN));
-  motor4 = Motor(PWM(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN));
-  Delay(DELAY_1S); // 延时约1S
-  // 设为最低占空比，电机就绪
+  // 调度器
+  tim_sch.mode_sch();
+  // 接收机
+  receiver.stick_throttle_ = Stick(5.020,9.999,0,NEGATIVE_LOGIC);
+  // 油门最高点，听到确认音 
+  motor1 = Motor(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN);
+  motor2 = Motor(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN);
+  motor3 = Motor(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN);
+  motor4 = Motor(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN);
+  // 电调接上电池，等待2S
+  Delay(DELAY_1S);
+  Delay(DELAY_1S);  
+  
+  // 以防万一，再次延迟2S
+  // Delay(DELAY_1S);
+  // Delay(DELAY_1S);
+  // 油门推到最低，等待1S
   motor1.set_duty(MIN_DUTY);
   motor2.set_duty(MIN_DUTY);
   motor3.set_duty(MIN_DUTY);
   motor4.set_duty(MIN_DUTY);
+  Delay(DELAY_1S);
+  Delay(DELAY_1S);
+  Delay(DELAY_1S);
+  // 油门最低点确认音，可以起飞
+  
+  // LED4
+  RCC_AHB1PeriphClockCmd(LED4_GPIO_CLK, ENABLE);
+  GPIO_InitStructure.GPIO_Pin = LED4_PIN;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStructure);
+  GPIO_ResetBits(LED4_GPIO_PORT,LED4_PIN);
+  init_flag = 1;
 }
 
-// TODO 调度器
-// void TIMx_IRQHandler(void) {}
+// 调度器
+uint32_t counter=0;
+void TIM8_UP_TIM13_IRQHandler(void) {
+  //
+  TIM_ClearITPendingBit(tim_sch.TIM, TIM_IT_Update);
+  //
+  counter++;
+  if ((counter%2000)==0) {
+    //GPIO_ToggleBits(LED4_GPIO_PORT, LED4_PIN);
+  }
+  //
+  receiver.update_data(tim_throttle.DutyCycle);
+  if (init_flag) {
+  motor1.set_duty(receiver.stick_throttle_.convert_duty_);
+  motor2.set_duty(receiver.stick_throttle_.convert_duty_);
+  motor3.set_duty(receiver.stick_throttle_.convert_duty_);
+  motor4.set_duty(receiver.stick_throttle_.convert_duty_);
+  }
+}
+
+
 
 // 接收机PWM占空比通过4个20mS中断读取
 void TIM2_IRQHandler(void) {
   tim_throttle.PWM_Input_Handler();
-  uint8_t tmp2[80];
+  /*uint8_t tmp2[80];
   float_to_string(tim_throttle.DutyCycle,tmp2);
   uint8_t tmp1[80] = "throttle:";
   GUI_Text(0,0,tmp1,White,Blue);
-  GUI_Text(0,LCD_LINE_SPACE,tmp2,White,Blue);
+  GUI_Text(0,LCD_LINE_SPACE,tmp2,White,Blue);*/
 }
 void TIM3_IRQHandler(void) {
   tim_pitch.PWM_Input_Handler();
-  uint8_t tmp2[80];
+  /*uint8_t tmp2[80];
   float_to_string(tim_pitch.DutyCycle,tmp2);
   uint8_t tmp1[80] = "pitch:";
   GUI_Text(0,2*LCD_LINE_SPACE,tmp1,White,Blue);
-  GUI_Text(0,3*LCD_LINE_SPACE,tmp2,White,Blue);
+  GUI_Text(0,3*LCD_LINE_SPACE,tmp2,White,Blue);*/
 }
 void TIM4_IRQHandler(void) {
   tim_yaw.PWM_Input_Handler();
-  uint8_t tmp2[80];
+  /*uint8_t tmp2[80];
   float_to_string(tim_yaw.DutyCycle,tmp2);
   uint8_t tmp1[80] = "yaw:";
   GUI_Text(0,4*LCD_LINE_SPACE,tmp1,White,Blue);
-  GUI_Text(0,5*LCD_LINE_SPACE,tmp2,White,Blue);
+  GUI_Text(0,5*LCD_LINE_SPACE,tmp2,White,Blue);*/
 }
 void TIM5_IRQHandler(void) {
   tim_roll.PWM_Input_Handler();
-  uint8_t tmp2[80];
+  /*uint8_t tmp2[80];
   float_to_string(tim_roll.DutyCycle,tmp2);
   uint8_t tmp1[80] = "roll:";
   GUI_Text(0,6*LCD_LINE_SPACE,tmp1,White,Blue);
-  GUI_Text(0,7*LCD_LINE_SPACE,tmp2,White,Blue);
+  GUI_Text(0,7*LCD_LINE_SPACE,tmp2,White,Blue);*/
 }  
-void TIM8_UP_TIM13_IRQHandler(void) {}
 
 #ifdef  USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line)

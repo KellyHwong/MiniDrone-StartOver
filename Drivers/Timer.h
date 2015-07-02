@@ -21,7 +21,7 @@ class Timer {
  private:
   // Datas
   uint8_t TIM_No;
-  TIM_TypeDef * TIM; // eg: TIM5
+  
   uint32_t RCC_Periph_TIM; // RCC
   IRQn_Type IRQn; // NVIC, eg: TIM5_IRQn
   float freq_;
@@ -34,6 +34,7 @@ class Timer {
   // Datas
   //void (Timer::*pFnIRQHandler)(Timer * tim); // IRQHandler
   // PWM Input params
+  TIM_TypeDef * TIM; // eg: TIM5
   float DutyCycle;
   float Frequency;
   // Funcs

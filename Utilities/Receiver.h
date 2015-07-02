@@ -5,13 +5,19 @@
  extern "C" {
 #endif
 
+#include "Utilities/Stick.h"
+
 class Receiver {
  private:
-  Stick sitck_throttle; // 油门
 
  public:
-  Stick(float min_duty, float max_duty, 0);
-  Stick();
+  Stick stick_throttle_; // 油门
+  Stick stick_pitch_;
+  Stick stick_roll_; // 油门
+  Stick stick_yaw_; // 油门
+  
+  Receiver();
+  void update_data(float duty1);
 }; // class Stick
 
 #ifdef __cplusplus

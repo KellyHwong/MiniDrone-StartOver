@@ -23,10 +23,10 @@ class Motor {
  private:
   PWM pwm_;
   float duty_;
-  float duty_limit(float duty);
+  float limit_duty(float duty);
  public:
   Motor();
-  Motor(PWM pwm);
+  Motor(uint32_t freq, float duty, uint8_t TIM_No, uint8_t CH_No,PinTypedef pin);
   void set_duty(float duty);
   float get_duty(void);
 }; // class Motor

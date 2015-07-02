@@ -213,7 +213,7 @@ void Timer::mode_sch(void) {
 
 
 void Timer::set_duty(float duty, uint8_t CH_No) {
-  uint16_t C_Val = (uint16_t) (TIMER_CLOCK / freq_ * duty);
+  uint16_t C_Val = (uint16_t) (TIMER_CLOCK / (this->freq_) * duty);
   if (CH_No==1) TIM_SetCompare1(this->TIM,C_Val);    //设置占空比
   if (CH_No==2) TIM_SetCompare2(this->TIM,C_Val);
   if (CH_No==3) TIM_SetCompare3(this->TIM,C_Val);
@@ -249,6 +249,7 @@ void Timer::config_IRQn(void) {
 
     //
     case (1): {this->IRQn = TIM1_CC_IRQn; break;}
+    case (8): {this->IRQn = TIM8_UP_TIM13_IRQn; break; }
   }
 }
 

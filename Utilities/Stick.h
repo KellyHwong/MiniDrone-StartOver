@@ -17,10 +17,14 @@ class Stick {
   float max_duty_; //
   float balance_duty_; // 不动操作杆时的占空比
   float std_duty_; // 标准化后的占空比
-  data_standardize();
+  void seft_standardize(void);
+  void seft_convert(void);
+  void seft_invert(void);
  public:
   Stick(float min_duty, float max_duty, float balance_duty, DATA_MODE mode);
   Stick();
+  float convert_duty_; // 转换后的占空比（可能有正负）
+  void get_now_duty(float now_duty);
 }; // class Stick
 
 #ifdef __cplusplus

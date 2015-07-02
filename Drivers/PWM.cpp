@@ -20,6 +20,7 @@ PWM::PWM(uint32_t freq, float duty, uint8_t TIM_No, uint8_t CH_No,PinTypedef pin
 }
 
 void PWM::set_duty(float duty) {
+  duty_ = duty;
   tim_.set_duty(duty, CH_No_);
 }
 

@@ -1,3 +1,5 @@
+#include "Utilities/Stick.h"
+
 #define STD_MIN 5.0
 #define STD_MAX 10.0
 #define STD_MID 7.5
@@ -5,22 +7,32 @@
 
 Stick::Stick() {}
 
-Stick(float min_duty, float max_duty, 0) {}
+Stick::Stick(float min_duty, float max_duty, float balance_duty, DATA_MODE mode) {}
 
-Stick::float data_convert(float data) {
+// 调用这个即可
+void Stick::seft_convert(void) {
+  seft_standardize();
   switch (mode_) {
-    case (NEGATIVE_LOGIC): return data_invert();
+    case (NEGATIVE_LOGIC): this->seft_invert();
   }
 }
 
-Stick::float data_invert(float data) {
-
+void Stick::seft_invert(void) {
+  convert_duty_ = STD_MAX + STD_MIN - std_duty_;
 }
 
-Stick::data_standardize() {
+void Stick::seft_standardize(void) {
   switch (mode_) {
     case (NEGATIVE_LOGIC): {
-      std_duty_ =
+      // 归一化到5.0~10.0
+      std_duty_ = (now_duty_ - min_duty_) / (max_duty_ - min_duty_)*STD_INTERVAL+STD_MIN;
+      break;
     }
   }
+}
+
+// 数据接收接口
+void Stick::get_now_duty(float now_duty) {
+  now_duty_ = now_duty;
+  this->seft_convert();
 }

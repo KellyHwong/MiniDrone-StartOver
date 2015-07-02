@@ -11,12 +11,12 @@
 
 Motor::Motor() {}
 
-Motor::Motor(PWM pwm) {
-  pwm_ = PWM(pwm);
+Motor::Motor(uint32_t freq, float duty, uint8_t TIM_No, uint8_t CH_No,PinTypedef pin) {
+  pwm_ = PWM(freq, duty, TIM_No, CH_No, pin);
 }
 
 // 输入PWM占空比限幅
-float Motor::duty_limit(float duty) {
+float Motor::limit_duty(float duty) {
   if (duty < MIN_DUTY)
     duty = MIN_DUTY;
   if (duty > MAX_DUTY)
@@ -25,7 +25,7 @@ float Motor::duty_limit(float duty) {
 }
 
 void Motor::set_duty(float duty) {
-  duty_ = duty_limit(duty);
+  duty_ = limit_duty(duty);
   pwm_.set_duty(duty_);
 }
 
