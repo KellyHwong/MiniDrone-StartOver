@@ -533,6 +533,16 @@
               <FileType>8</FileType>
               <FilePath>.\Utilities\Receiver.cpp</FilePath>
             </File>
+            <File>
+              <FileName>LCD.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Utilities\LCD.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>AsciiLib.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Utilities\AsciiLib.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

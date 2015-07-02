@@ -29,31 +29,31 @@
 #define SCH_TIM      8
 #define MOTOR1_PWM_TIM 9
 #define MOTOR2_PWM_TIM 9
-#define MOTOR3_PWM_TIM 10
-#define MOTOR4_PWM_TIM 11
+#define MOTOR3_PWM_TIM 11
+#define MOTOR4_PWM_TIM 10
 #define THROTTLE_PIN PB3
 #define PITCH_PIN    PC7
 #define YAW_PIN      PD13
 #define ROLL_PIN     PA1
 
-#define MOTOR1_PWM_CH  2
-#define MOTOR1_PWM_PIN  PA3
+#define MOTOR1_PWM_CH  1
+#define MOTOR1_PWM_PIN  PA2
 
-#define MOTOR2_PWM_CH  1
-#define MOTOR2_PWM_PIN  PA2
+#define MOTOR2_PWM_CH  2
+#define MOTOR2_PWM_PIN  PA3
 
 #define MOTOR3_PWM_CH  1
-#define MOTOR3_PWM_PIN  PB8
+#define MOTOR3_PWM_PIN  PB9
 
 #define MOTOR4_PWM_CH  1
-#define MOTOR4_PWM_PIN  PB9
+#define MOTOR4_PWM_PIN  PB8
 
-// 三个通道捕获计时器
-Timer tim_throttle(THROTTLE_TIM); // ch3
-Timer tim_pitch(PITCH_TIM); // ch1
-Timer tim_yaw(YAW_TIM); // ch2
-Timer tim_roll(ROLL_TIM);
-// Motors
+// 4个通道捕获计时器
+Timer tim_throttle(THROTTLE_TIM); // 油门（升降） ch3
+Timer tim_pitch(PITCH_TIM); // 俯仰（前后） ch2
+Timer tim_yaw(YAW_TIM); // 偏航(水平转动) ch4
+Timer tim_roll(ROLL_TIM); // 翻滚（左右） ch1
+// 4个电机
 Motor motor1;
 Motor motor2;
 Motor motor3;
@@ -139,16 +139,10 @@ void Aircraft_Init(void) {
 // 调度器
 uint32_t counter=0;
 void TIM8_UP_TIM13_IRQHandler(void) {
-  //
   TIM_ClearITPendingBit(tim_sch.TIM, TIM_IT_Update);
-  //
-  counter++;
-  if ((counter%2000)==0) {
-    //GPIO_ToggleBits(LED4_GPIO_PORT, LED4_PIN);
-  }
-  //
+  // 接收器更新数据
   receiver.update_data(tim_throttle.DutyCycle);
-  if (init_flag) {
+  if (init_flag) { // 只有当初始化完成才进行调度
   motor1.set_duty(receiver.stick_throttle_.convert_duty_);
   motor2.set_duty(receiver.stick_throttle_.convert_duty_);
   motor3.set_duty(receiver.stick_throttle_.convert_duty_);
