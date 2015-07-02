@@ -46,14 +46,14 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\IO_Toggle\</OutputDirectory>
+          <OutputDirectory>.\STM32_Aircraft\</OutputDirectory>
           <OutputName>IO_Toggle</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\IO_Toggle\</ListingPath>
+          <ListingPath>.\STM32_Aircraft\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -508,20 +508,30 @@
               <FileType>8</FileType>
               <FilePath>.\Drivers\Timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>PWM.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Drivers\PWM.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Utilities</GroupName>
           <Files>
             <File>
-              <FileName>LCD.cpp</FileName>
+              <FileName>Motor.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\Utilities\LCD.cpp</FilePath>
+              <FilePath>.\Utilities\Motor.cpp</FilePath>
             </File>
             <File>
-              <FileName>AsciiLib.cpp</FileName>
+              <FileName>Stick.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\Utilities\AsciiLib.cpp</FilePath>
+              <FilePath>.\Utilities\Stick.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Receiver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Utilities\Receiver.cpp</FilePath>
             </File>
           </Files>
         </Group>
