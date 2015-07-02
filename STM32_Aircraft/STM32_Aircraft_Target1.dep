@@ -1,5 +1,5 @@
 Dependencies for Project 'STM32_Aircraft', Target 'Target1': (DO NOT MODIFY !)
-F (.\Aircraft.cpp)(0x5594A558)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\aircraft.o --omf_browse .\stm32_aircraft\aircraft.crf --depend .\stm32_aircraft\aircraft.d)
+F (.\Aircraft.cpp)(0x5594BF75)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\aircraft.o --omf_browse .\stm32_aircraft\aircraft.crf --depend .\stm32_aircraft\aircraft.d)
 I (Aircraft.h)(0x55940CC3)
 I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\stdio.h)(0x5475F300)
 I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\stdint.h)(0x5475F300)
@@ -474,7 +474,7 @@ I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32
 I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x4EAA13FA)
 I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x4EAA13FA)
 I (.\Drivers/Pin.h)(0x5593E576)
-F (.\Drivers\Timer.cpp)(0x5594369B)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\timer.o --omf_browse .\stm32_aircraft\timer.crf --depend .\stm32_aircraft\timer.d)
+F (.\Drivers\Timer.cpp)(0x5594BF33)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\timer.o --omf_browse .\stm32_aircraft\timer.crf --depend .\stm32_aircraft\timer.d)
 I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\stdint.h)(0x5475F300)
 I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_tim.h)(0x4EAA13FA)
 I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include\stm32f4xx.h)(0x4EAA13F6)
@@ -609,11 +609,55 @@ I (.\Utilities/AsciiLib.h)(0x55938699)
 I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\string.h)(0x5475F300)
 I (.\Utilities/Motor.h)(0x55943192)
 I (.\Drivers/PWM.h)(0x55941A5E)
-F (.\Utilities\Stick.cpp)(0x559418E2)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\stick.o --omf_browse .\stm32_aircraft\stick.crf --depend .\stm32_aircraft\stick.d)
+F (.\Utilities\Stick.cpp)(0x5594BE6D)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\stick.o --omf_browse .\stm32_aircraft\stick.crf --depend .\stm32_aircraft\stick.d)
 I (.\Utilities/Stick.h)(0x55941749)
-F (.\Utilities\Receiver.cpp)(0x55943F83)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\receiver.o --omf_browse .\stm32_aircraft\receiver.crf --depend .\stm32_aircraft\receiver.d)
+F (.\Utilities\Receiver.cpp)(0x5594BA1B)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\receiver.o --omf_browse .\stm32_aircraft\receiver.crf --depend .\stm32_aircraft\receiver.d)
 I (.\Utilities/Receiver.h)(0x55943F94)
 I (.\Utilities/Stick.h)(0x55941749)
+F (.\Utilities\LCD.cpp)(0x559351D9)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\lcd.o --omf_browse .\stm32_aircraft\lcd.crf --depend .\stm32_aircraft\lcd.d)
+I (.\Utilities/LCD.h)(0x55938686)
+I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\math.h)(0x5475F2FE)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include\stm32f4xx.h)(0x4EAA13F6)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include\core_cm4.h)(0x4EAA13F6)
+I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include\core_cmInstr.h)(0x4EAA13F6)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include\core_cmFunc.h)(0x4EAA13F6)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include\core_cm4_simd.h)(0x4EAA13F6)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include\system_stm32f4xx.h)(0x4EAA13F6)
+I (.\stm32f4xx_conf.h)(0x4E89A17A)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_crc.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_cryp.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dbgmcu.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dma.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_exti.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_hash.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_i2c.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_iwdg.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_pwr.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rng.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rtc.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sdio.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_spi.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_syscfg.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_tim.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x4EAA13FA)
+I (..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x4EAA13FA)
+I (.\config.h)(0x4F8D3D93)
+I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\stdio.h)(0x5475F300)
+I (.\Utilities/AsciiLib.h)(0x55938699)
+I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\string.h)(0x5475F300)
+F (.\Utilities\AsciiLib.cpp)(0x559351F3)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\asciilib.o --omf_browse .\stm32_aircraft\asciilib.crf --depend .\stm32_aircraft\asciilib.d)
+I (.\Utilities/AsciiLib.h)(0x55938699)
+I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\string.h)(0x5475F300)
 F (.\Misc\Delay.cpp)(0x559369D0)(--cpp -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I.\ -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include -I..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery-I D:\_Keil\STM32_Aircraft\RTE-I "D:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.4.0"-I "D:\Program Files (x86)\Keil\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -D__FPU_PRESENT="1" -D__FPU_USED="1"-o .\stm32_aircraft\delay_1.o --omf_browse .\stm32_aircraft\delay_1.crf --depend .\stm32_aircraft\delay_1.d)
 I (D:\Program Files (x86)\Keil\ARM\ARMCC\include\stdint.h)(0x5475F300)
 I (.\Misc/Delay.h)(0x559386EF)

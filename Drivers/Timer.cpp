@@ -301,7 +301,8 @@ void Timer::PWM_Input_Handler(void) {
   TIM_ClearITPendingBit(TIM, TIM_IT_CC2); //
   IC2Value = TIM_GetCapture2(TIM);
   if (IC2Value!=0) {
-    DutyCycle= (TIM_GetCapture1(TIM) * 100.0) / IC2Value;
+    // DutyCycle= (TIM_GetCapture1(TIM) * 100.0) / IC2Value;
+    DutyCycle= TIM_GetCapture1(TIM) * 1.0 / IC2Value; // 小数表示，而不是百分数！！！
     Frequency= TIMER_CLOCK / IC2Value;
   }
   else {

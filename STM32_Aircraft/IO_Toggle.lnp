@@ -18,6 +18,8 @@
 ".\stm32_aircraft\motor.o"
 ".\stm32_aircraft\stick.o"
 ".\stm32_aircraft\receiver.o"
+".\stm32_aircraft\lcd.o"
+".\stm32_aircraft\asciilib.o"
 ".\stm32_aircraft\delay_1.o"
 ".\stm32_aircraft\formatter_1.o"
 --library_type=microlib --strict --scatter ".\STM32_Aircraft\IO_Toggle.sct"

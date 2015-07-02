@@ -1,13 +1,23 @@
 #include "Utilities/Stick.h"
 
-#define STD_MIN 5.0
-#define STD_MAX 10.0
-#define STD_MID 7.5
-#define STD_INTERVAL 5.0
+#define STD_MIN 0.05
+#define STD_MAX 0.10
+#define STD_MID 0.075
+#define STD_INTERVAL 0.05
 
-Stick::Stick() {}
+Stick::Stick() {
+  min_duty_ = STD_MIN;
+  max_duty_ = STD_MAX;
+  balance_duty_ = STD_MID;
+  mode_ = NEGATIVE_LOGIC;
+}
 
-Stick::Stick(float min_duty, float max_duty, float balance_duty, DATA_MODE mode) {}
+Stick::Stick(float min_duty, float max_duty, float balance_duty, DATA_MODE mode) {
+  min_duty_ = min_duty;
+  max_duty_ = max_duty;
+  balance_duty_ = balance_duty;
+  mode_ = mode;
+}
 
 // 调用这个即可
 void Stick::seft_convert(void) {
@@ -25,7 +35,7 @@ void Stick::seft_standardize(void) {
   switch (mode_) {
     case (NEGATIVE_LOGIC): {
       // 归一化到5.0~10.0
-      std_duty_ = (now_duty_ - min_duty_) / (max_duty_ - min_duty_)*STD_INTERVAL+STD_MIN;
+      std_duty_ = (now_duty_-min_duty_)/(max_duty_-min_duty_)*STD_INTERVAL + STD_MIN;
       break;
     }
   }
