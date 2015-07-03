@@ -1,3 +1,5 @@
+//#define DEBUG
+
 #include "Aircraft.h"
 #include <stdio.h>
 #include <stdint.h>
@@ -11,6 +13,7 @@
 #include "Utilities/Motor.h"
 #include "Utilities/Receiver.h"
 #include "Utilities/Stick.h"
+#include "Utilities/MPU6050.h"
 #define _DEBUG_WITH_BLUEBOOTH
 
 #define _DEBUG_WITH_LCD
@@ -18,7 +21,10 @@
 #ifdef _DEBUG_WITH_LCD
 #include "Utilities/LCD.h"
 #endif
+
 #define DELAY_1S 40000000
+#define DELAY_100mS 4000000
+
 #define PWM_FREQ 50
 // 宏定义
 // 信号接收定时器，引脚
@@ -65,20 +71,32 @@ Receiver receiver;
 //receiver.stick_pitch = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
 //receiver.stick_roll = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
 //receiver.stick_yaw = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
+// 电机初始化
+uint8_t motor_init_flag = 0;
+// 接收缓冲区
+#define RXBUFFLE_SIZE 200
+uint8_t RxBuffer[RXBUFFLE_SIZE];
+uint8_t firstinputflag;
+uint8_t RxIndex;
 
 int main(void)
 {
   Aircraft_Init();
   while (1)
   {
-    Delay(DELAY_1S);
-    GPIO_ToggleBits(LED4_GPIO_PORT, LED4_PIN);
+    //MPU6050_TEST();
 	}
   return -1;
 }
 
-uint8_t init_flag = 0;
 void Aircraft_Init(void) {
+  RxBuffer[0] = '\0';
+  firstinputflag = 1;
+  RxIndex = 0;
+  // 陀螺仪
+  Init_MPU6050();
+
+  
   GPIO_InitTypeDef  GPIO_InitStructure;
   // LCD
 #ifdef _DEBUG_WITH_LCD
@@ -101,7 +119,10 @@ void Aircraft_Init(void) {
   // 调度器
   tim_sch.mode_sch();
   // 接收机
-  receiver.stick_throttle_ = Stick(0.0502,0.0999,0,NEGATIVE_LOGIC);
+  receiver.throttle_ = Stick(0.0502,0.0999,0,NEGATIVE_LOGIC);
+  receiver.yaw_ = Stick(0.0502,0.0999,0, NEGATIVE_LOGIC);
+  receiver.pitch_ = Stick(0.0502,0.0999,0,NEGATIVE_LOGIC);
+  receiver.roll_= Stick(0.0502,0.0999,0,NEGATIVE_LOGIC);
   // 油门最高点，听到确认音 
   motor1 = Motor(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN);
   motor2 = Motor(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN);
@@ -109,11 +130,7 @@ void Aircraft_Init(void) {
   motor4 = Motor(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN);
   // 电调接上电池，等待2S
   Delay(DELAY_1S);
-  Delay(DELAY_1S);  
-  
-  // 以防万一，再次延迟2S
-  // Delay(DELAY_1S);
-  // Delay(DELAY_1S);
+  Delay(DELAY_1S);
   // 油门推到最低，等待1S
   motor1.set_duty(MIN_DUTY);
   motor2.set_duty(MIN_DUTY);
@@ -133,7 +150,7 @@ void Aircraft_Init(void) {
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStructure);
   GPIO_ResetBits(LED4_GPIO_PORT,LED4_PIN);
-  init_flag = 1;
+  motor_init_flag = 1;
 }
 
 // 调度器
@@ -141,12 +158,19 @@ uint32_t counter=0;
 void TIM8_UP_TIM13_IRQHandler(void) {
   TIM_ClearITPendingBit(tim_sch.TIM, TIM_IT_Update);
   // 接收器更新数据
-  receiver.update_data(tim_throttle.DutyCycle);
-  if (init_flag) { // 只有当初始化完成才进行调度
-  motor1.set_duty(receiver.stick_throttle_.convert_duty_);
-  motor2.set_duty(receiver.stick_throttle_.convert_duty_);
-  motor3.set_duty(receiver.stick_throttle_.convert_duty_);
-  motor4.set_duty(receiver.stick_throttle_.convert_duty_);
+  receiver.update_data(tim_throttle.DutyCycle, \
+    tim_yaw.DutyCycle, \
+    tim_pitch.DutyCycle, \
+    tim_roll.DutyCycle);
+  
+  if (motor_init_flag) { // 只有当初始化完成才进行调度
+    /*
+    controller.ControlRoutine(); // 3路PID控制
+  motor1.set_duty(receiver.throttle_.convert_duty_);
+  motor2.set_duty(receiver.throttle_.convert_duty_);
+  motor3.set_duty(receiver.throttle_.convert_duty_);
+  motor4.set_duty(receiver.throttle_.convert_duty_);
+    */
   }
 }
 
@@ -159,7 +183,7 @@ void TIM2_IRQHandler(void) {
   uint8_t tmp2[80];
   uint8_t tmp3[80];
   float_to_string(tim_throttle.DutyCycle,tmp2);
-  float_to_string(receiver.stick_throttle_.convert_duty_,tmp3);
+  float_to_string(receiver.throttle_.convert_duty_,tmp3);
   uint8_t tmp1[80] = "throttle:";
   GUI_Text(0,0,tmp1,White,Blue);
   GUI_Text(0,LCD_LINE_SPACE,tmp2,White,Blue);
@@ -196,6 +220,47 @@ void TIM5_IRQHandler(void) {
   GUI_Text(0,7*LCD_LINE_SPACE,tmp2,White,Blue);
 #endif
 }  
+
+
+void USART3_IRQHandler(void){
+		char ch;	
+		if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
+      ch = USART_ReceiveData(USART3);
+#ifdef DEBUG
+      RxBuffer[RxIndex]	= ch;
+      RxIndex++;	
+#endif
+      
+#ifndef DEBUG // 回车有可能是0x0A，也有可能是0x0D 0x0A
+      if (ch!=0x0D) {// 不接收0x0D
+        /*
+        算法有问题！！！这里假定了第一个字符不是回车
+        千万不要只发回车，因为第一个字符一定会被接收！！！
+        这个case以后再处理，现在先用着
+        */
+        if(firstinputflag) {
+          firstinputflag = 0; // 开始组装字符串，并判断结尾0x0A
+          RxIndex = 0;
+          RxBuffer[RxIndex]	= ch;
+          RxIndex++;	
+        }
+        else{
+          if(ch == 0x0A){
+            RxBuffer[RxIndex] = '\0';
+            firstinputflag = 1;	// 此次组装结束，准备下次组装
+          }
+          else{
+            RxBuffer[RxIndex] = ch;
+            RxIndex++; // 继续读下一个
+          }
+        }
+      }
+      /* TODO
+        
+      */
+#endif
+    }
+}
 
 #ifdef  USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line)

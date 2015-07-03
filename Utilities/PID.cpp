@@ -14,6 +14,12 @@ PID::PID(addr_controlled_var, Kp, Ki, Kd, ) {
 
 }
 
+void EvalOutput(void) {
+  pout_ = Kp_ * ;
+  iout_ = 1;
+  dout_ = 1;
+}
+
 // PID控制例程
 void PID::control(void) {
   e_ = setpoint_ - (*ptr_measured);

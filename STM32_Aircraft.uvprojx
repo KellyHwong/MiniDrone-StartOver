@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F4XX,__FPU_PRESENT=1,__FPU_USED =1</Define>
               <Undefine></Undefine>
-              <IncludePath>.\;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery</IncludePath>
+              <IncludePath>.\;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery;.\Utilities;.\Drivers;.\Misc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -513,6 +513,16 @@
               <FileType>8</FileType>
               <FilePath>.\Drivers\PWM.cpp</FilePath>
             </File>
+            <File>
+              <FileName>IIC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\IIC.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -542,6 +552,11 @@
               <FileName>AsciiLib.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Utilities\AsciiLib.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>MPU6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Utilities\MPU6050.c</FilePath>
             </File>
           </Files>
         </Group>

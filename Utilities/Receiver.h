@@ -9,15 +9,14 @@
 
 class Receiver {
  private:
-
  public:
-  Stick stick_throttle_; // 油门
-  Stick stick_pitch_;
-  Stick stick_roll_; // 油门
-  Stick stick_yaw_; // 油门
-  
+  Stick throttle_; // 油门
+  Stick yaw_; // 偏航
+  Stick pitch_; // 俯仰
+  Stick roll_; // 翻滚
   Receiver();
-  void update_data(float duty1);
+  void update_data(float throttle);
+  void update_data(float throttle, float yaw, float pitch, float roll);
 }; // class Stick
 
 #ifdef __cplusplus
