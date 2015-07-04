@@ -5,6 +5,7 @@
 
 #define BAUDRATE 38400 // 38400
 #define BAUDRATE_ERROR 3 // 3 // 这个工程波特率设置有问题，必须乘以3才能得到正确的波特率
+#define RIGHT_HANDED // 使用右手系
 
 char TX_DATA[10];  	 //显示据缓存区
 char BUF[15];       //接收数据缓存区
@@ -83,10 +84,15 @@ void READ_MPU6050(void)
    BUF[1]=Single_Read(MPU6050_Addr,GYRO_XOUT_H);
    GTRO_X=	(BUF[1]<<8)|BUF[0];
   // GTRO_X/=16.4; 						   //读取计算X轴数据
-
+#ifdef RIGHT_HANDED
+  GTRO_X = - GTRO_X;  // X 和 Y 的角速度反了
+#endif
    BUF[2]=Single_Read(MPU6050_Addr,GYRO_YOUT_L);
    BUF[3]=Single_Read(MPU6050_Addr,GYRO_YOUT_H);
    GTRO_Y=	(BUF[3]<<8)|BUF[2];
+#ifdef RIGHT_HANDED
+  GTRO_Y = - GTRO_Y;
+#endif
    //GTRO_Y/=16.4; 						   //读取计算Y轴数据
    BUF[4]=Single_Read(MPU6050_Addr,GYRO_ZOUT_L);
    BUF[5]=Single_Read(MPU6050_Addr,GYRO_ZOUT_H);
@@ -106,6 +112,9 @@ void READ_MPU6050(void)
    BUF[11]=Single_Read(MPU6050_Addr,ACCEL_ZOUT_H);
    ACCEL_Z=	(BUF[11]<<8)|BUF[10];
    //ACCEL_Z/=163.84; 					       //读取计算Z轴数据
+#ifdef RIGHT_HANDED
+   ACCEL_Z = - ACCEL_Z;
+#endif
 
    BUF[12]=Single_Read(MPU6050_Addr,TEMP_OUT_L);
    BUF[13]=Single_Read(MPU6050_Addr,TEMP_OUT_H);

@@ -5,7 +5,7 @@
  extern "C" {
 #endif
 
-#include "Utilities/Stick.h"
+#include "Stick.h"
 
 class Receiver {
  private:

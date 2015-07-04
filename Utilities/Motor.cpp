@@ -3,11 +3,13 @@
 #include "stm32f4xx_gpio.h"
 #include "misc.h"
 
-#include "Drivers/Timer.h"
-#include "Drivers/Pin.h"
-#include "Misc/Formatter.h"
-#include "Utilities/LCD.h"
-#include "Utilities/Motor.h"
+#include "Timer.h"
+#include "Pin.h"
+#include "Formatter.h"
+#include "LCD.h"
+#include "Motor.h"
+
+#define STARTUP_DUTY 0.0525 // 测试出来的最小电机启动占空比
 
 Motor::Motor() {}
 

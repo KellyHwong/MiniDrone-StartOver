@@ -6,7 +6,9 @@
 #endif
 
 typedef enum {
-  NEGATIVE_LOGIC // 负逻辑，反向即可
+  NEGATIVE_LOGIC,
+  NEGATIVE_LOGIC_BALANCED,
+  POSITIVE_LOGIC_BALANCED
 } DATA_MODE; // 数据模式
 
 class Stick {

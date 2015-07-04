@@ -1,58 +1,26 @@
-//#define DEBUG
+//#define _DEBUG_MPU6050
+//#define _DEBUG_MOTOR
+//#define _DEBUG_USART
+//#define _DEBUG_WITH_LCD
+//#define INIT_MOTOR
+//#define _DEBUG_STICK
 
-#include "Aircraft.h"
 #include <stdio.h>
 #include <stdint.h>
 #include "stm32f4xx.h"
 #include "misc.h"
 #include "stm32f4_discovery.h"
 
-#include "Drivers/Timer.h"
-#include "Misc/Formatter.h"
-#include "Misc/Delay.h"
-#include "Utilities/Motor.h"
-#include "Utilities/Receiver.h"
-#include "Utilities/Stick.h"
-#include "Utilities/MPU6050.h"
-#define _DEBUG_WITH_BLUEBOOTH
-
-#define _DEBUG_WITH_LCD
-
-#ifdef _DEBUG_WITH_LCD
-#include "Utilities/LCD.h"
-#endif
-
-#define DELAY_1S 40000000
-#define DELAY_100mS 4000000
-
-#define PWM_FREQ 50
-// 宏定义
-// 信号接收定时器，引脚
-#define THROTTLE_TIM 2
-#define PITCH_TIM    3
-#define YAW_TIM      4
-#define ROLL_TIM     5
-#define SCH_TIM      8
-#define MOTOR1_PWM_TIM 9
-#define MOTOR2_PWM_TIM 9
-#define MOTOR3_PWM_TIM 11
-#define MOTOR4_PWM_TIM 10
-#define THROTTLE_PIN PB3
-#define PITCH_PIN    PC7
-#define YAW_PIN      PD13
-#define ROLL_PIN     PA1
-
-#define MOTOR1_PWM_CH  1
-#define MOTOR1_PWM_PIN  PA2
-
-#define MOTOR2_PWM_CH  2
-#define MOTOR2_PWM_PIN  PA3
-
-#define MOTOR3_PWM_CH  1
-#define MOTOR3_PWM_PIN  PB9
-
-#define MOTOR4_PWM_CH  1
-#define MOTOR4_PWM_PIN  PB8
+#include "Aircraft.h"
+#include "Delay.h"
+#include "Formatter.h"
+#include "LCD.h"
+#include "Motor.h"
+#include "MPU6050.h"
+#include "Receiver.h"
+#include "Stick.h"
+#include "Timer.h"
+#include "usart.h"
 
 // 4个通道捕获计时器
 Timer tim_throttle(THROTTLE_TIM); // 油门（升降） ch3
@@ -67,14 +35,14 @@ Motor motor4;
 // 调度器
 Timer tim_sch(SCH_TIM);
 // 通道捕获器和解释器
-Receiver receiver; 
+Receiver receiver;
 //receiver.stick_pitch = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
 //receiver.stick_roll = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
 //receiver.stick_yaw = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
 // 电机初始化
 uint8_t motor_init_flag = 0;
 // 接收缓冲区
-#define RXBUFFLE_SIZE 200
+
 uint8_t RxBuffer[RXBUFFLE_SIZE];
 uint8_t firstinputflag;
 uint8_t RxIndex;
@@ -84,7 +52,20 @@ int main(void)
   Aircraft_Init();
   while (1)
   {
-    //MPU6050_TEST();
+#ifdef _DEBUG_MPU6050
+    MPU6050_TEST();
+#endif
+#ifdef _DEBUG_MOTOR
+    Delay(DELAY_1S/2);
+    printf("%f   ",receiver.throttle_.convert_duty_);
+#endif
+#ifdef _DEBUG_STICK
+    Delay(DELAY_1S/2);
+    printf("%f   ",tim_yaw.DutyCycle);
+#endif
+
+    Delay(DELAY_1S/2);
+    printf("%s",RxBuffer);
 	}
   return -1;
 }
@@ -96,7 +77,7 @@ void Aircraft_Init(void) {
   // 陀螺仪
   Init_MPU6050();
 
-  
+
   GPIO_InitTypeDef  GPIO_InitStructure;
   // LCD
 #ifdef _DEBUG_WITH_LCD
@@ -119,28 +100,35 @@ void Aircraft_Init(void) {
   // 调度器
   tim_sch.mode_sch();
   // 接收机
-  receiver.throttle_ = Stick(0.0502,0.0999,0,NEGATIVE_LOGIC);
-  receiver.yaw_ = Stick(0.0502,0.0999,0, NEGATIVE_LOGIC);
-  receiver.pitch_ = Stick(0.0502,0.0999,0,NEGATIVE_LOGIC);
-  receiver.roll_= Stick(0.0502,0.0999,0,NEGATIVE_LOGIC);
-  // 油门最高点，听到确认音 
+  /*
+  数据在2015.7.4凌晨测得
+  */
+  receiver.throttle_ = Stick(0.050542,0.09999,0,NEGATIVE_LOGIC);
+  receiver.yaw_ = Stick(0.050795,0.09999,0.75392, POSITIVE_LOGIC_BALANCED);
+  receiver.pitch_ = Stick(0.049995,0.099945,0.074946,POSITIVE_LOGIC_BALANCED);
+  receiver.roll_= Stick(0.049995,0.093991,0.068993,NEGATIVE_LOGIC_BALANCED);
+  // 油门最高点，听到确认音
   motor1 = Motor(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN);
   motor2 = Motor(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN);
   motor3 = Motor(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN);
   motor4 = Motor(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN);
   // 电调接上电池，等待2S
+#ifdef INIT_MOTOR
   Delay(DELAY_1S);
   Delay(DELAY_1S);
+#endif
   // 油门推到最低，等待1S
   motor1.set_duty(MIN_DUTY);
   motor2.set_duty(MIN_DUTY);
   motor3.set_duty(MIN_DUTY);
   motor4.set_duty(MIN_DUTY);
+#ifdef INIT_MOTOR
   Delay(DELAY_1S);
   Delay(DELAY_1S);
   Delay(DELAY_1S);
+#endif
   // 油门最低点确认音，可以起飞
-  
+
   // LED4
   RCC_AHB1PeriphClockCmd(LED4_GPIO_CLK, ENABLE);
   GPIO_InitStructure.GPIO_Pin = LED4_PIN;
@@ -153,8 +141,7 @@ void Aircraft_Init(void) {
   motor_init_flag = 1;
 }
 
-// 调度器
-uint32_t counter=0;
+// 调度器，每次0.5mS
 void TIM8_UP_TIM13_IRQHandler(void) {
   TIM_ClearITPendingBit(tim_sch.TIM, TIM_IT_Update);
   // 接收器更新数据
@@ -162,15 +149,17 @@ void TIM8_UP_TIM13_IRQHandler(void) {
     tim_yaw.DutyCycle, \
     tim_pitch.DutyCycle, \
     tim_roll.DutyCycle);
-  
+
   if (motor_init_flag) { // 只有当初始化完成才进行调度
     /*
     controller.ControlRoutine(); // 3路PID控制
+    */
+#ifdef _DEBUG_MOTOR
   motor1.set_duty(receiver.throttle_.convert_duty_);
   motor2.set_duty(receiver.throttle_.convert_duty_);
   motor3.set_duty(receiver.throttle_.convert_duty_);
   motor4.set_duty(receiver.throttle_.convert_duty_);
-    */
+#endif
   }
 }
 
@@ -219,19 +208,21 @@ void TIM5_IRQHandler(void) {
   GUI_Text(0,6*LCD_LINE_SPACE,tmp1,White,Blue);
   GUI_Text(0,7*LCD_LINE_SPACE,tmp2,White,Blue);
 #endif
-}  
+}
 
-
+/*
+用手机上的蓝牙串口助手能够成功发送字符串
+*/
 void USART3_IRQHandler(void){
-		char ch;	
+		char ch;
 		if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
       ch = USART_ReceiveData(USART3);
-#ifdef DEBUG
+#ifdef _DEBUG_USART
       RxBuffer[RxIndex]	= ch;
-      RxIndex++;	
+      RxIndex++;
 #endif
-      
-#ifndef DEBUG // 回车有可能是0x0A，也有可能是0x0D 0x0A
+
+#ifndef _DEBUG_USART // 回车有可能是0x0A，也有可能是0x0D 0x0A
       if (ch!=0x0D) {// 不接收0x0D
         /*
         算法有问题！！！这里假定了第一个字符不是回车
@@ -242,7 +233,7 @@ void USART3_IRQHandler(void){
           firstinputflag = 0; // 开始组装字符串，并判断结尾0x0A
           RxIndex = 0;
           RxBuffer[RxIndex]	= ch;
-          RxIndex++;	
+          RxIndex++;
         }
         else{
           if(ch == 0x0A){
@@ -256,7 +247,7 @@ void USART3_IRQHandler(void){
         }
       }
       /* TODO
-        
+      usart_cmd.Execute();
       */
 #endif
     }

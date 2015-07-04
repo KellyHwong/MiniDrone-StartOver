@@ -13,6 +13,7 @@ class Gyroscope {
  private:
 
  public:
+  // 六轴数据初始化
   Gyroscope(float min_duty, float max_duty, float balance_duty, DATA_MODE mode);
   Gyroscope();
   float convert_duty_; // 转换后的占空比（可能有正负）

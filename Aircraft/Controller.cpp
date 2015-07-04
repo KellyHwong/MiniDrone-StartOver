@@ -1,5 +1,7 @@
 #include "Utilities/Controller.h"
 
+#define MAX_ANGLE 8.333
+
 Controller::Controller() {}
 
 void Controller::update_data(float throttl#include "Utilities/Controller.h"
