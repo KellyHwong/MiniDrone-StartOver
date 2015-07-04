@@ -14,37 +14,39 @@
 class PID() {
  private:
   // 调度设置
+  /* PID类不负责调度设置，调度设置外外部Control类中实现，PID只要负责自己的事情
+  PID自己的事情就几个，输入期望（比如角度值），输入测量值，Eval误差（error_,pre_error_,error_d_,error_i_）
+  输出反馈值（还是角度）
   unsigned int interval_unit_; // 调度时间单位，in mS，用来各个输出计算
   // 与调度器有关
   unsigned int interval_ticks_; // 调度间隔，in ticks
   unsigned int interval_counter_; // 调度计数
+  */
   // 控制设置
   float Kp_;
   float Ki_;
   float Kd_;
+  float dt_; // 时间间隔
   // 反馈设置
   float setpoint_;
+  // 误差计算
   float pre_error_; //上一个误差
   float error_; // 误差
-  float d_; // 误差的差分
-  float i_; // 误差的积分
+  float error_d_; // 误差的差分
+  float error_i_; // 误差的积分
   // 输出
-  float pout_;
-  float iout_;
+  float pout_; // P路输出
+  float iout_; // I路输出
     // 积分限幅
     float imax_;
     float imin_;
-  float dout_;
-  float out_;
+  float dout_; // D路输出
+  float out_; // 总输出
   void EvalOutput(void); // 计算三个输出
-  // set 函数
-  /* float pout(float p_o);
-  float iout(float i_o);
-  float dout(float d_o); */
  public:
   PID();
-  // set函数
-  void error(float e); // 输入误差接口
+  // 输入误差
+
   // get输出
   float pout(); // p端输出
   float iout(); // i端输出

@@ -1,4 +1,4 @@
-#include "Utilities/Stick.h"
+#include "Stick.h"
 
 #define MIN_STICK_DUTY 0.05
 #define MAX_STICK_DUTY 0.10

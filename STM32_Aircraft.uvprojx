@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F4XX,__FPU_PRESENT=1,__FPU_USED =1</Define>
               <Undefine></Undefine>
-              <IncludePath>.\;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery;.\Utilities;.\Drivers;.\Misc</IncludePath>
+              <IncludePath>.\;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery;.\Utilities;.\Drivers;.\Misc;.\Aircraft</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -534,16 +534,6 @@
               <FilePath>.\Utilities\Motor.cpp</FilePath>
             </File>
             <File>
-              <FileName>Stick.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Utilities\Stick.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>Receiver.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Utilities\Receiver.cpp</FilePath>
-            </File>
-            <File>
               <FileName>LCD.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Utilities\LCD.cpp</FilePath>
@@ -572,6 +562,21 @@
               <FileName>Formatter.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Misc\Formatter.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Aircraft</GroupName>
+          <Files>
+            <File>
+              <FileName>Receiver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Aircraft\Receiver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Stick.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Aircraft\Stick.cpp</FilePath>
             </File>
           </Files>
         </Group>

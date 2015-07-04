@@ -1,10 +1,3 @@
-//#define _DEBUG_MPU6050
-//#define _DEBUG_MOTOR
-//#define _DEBUG_USART
-//#define _DEBUG_WITH_LCD
-//#define INIT_MOTOR
-//#define _DEBUG_STICK
-
 #include <stdio.h>
 #include <stdint.h>
 #include "stm32f4xx.h"
@@ -22,23 +15,25 @@
 #include "Timer.h"
 #include "usart.h"
 
+/* 全局变量声明 */
 // 4个通道捕获计时器
 Timer tim_throttle(THROTTLE_TIM); // 油门（升降） ch3
 Timer tim_pitch(PITCH_TIM); // 俯仰（前后） ch2
 Timer tim_yaw(YAW_TIM); // 偏航(水平转动) ch4
 Timer tim_roll(ROLL_TIM); // 翻滚（左右） ch1
 // 4个电机
-Motor motor1;
 Motor motor2;
+Motor motor1;
 Motor motor3;
 Motor motor4;
 // 调度器
 Timer tim_sch(SCH_TIM);
 // 通道捕获器和解释器
 Receiver receiver;
-//receiver.stick_pitch = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
-//receiver.stick_roll = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
-//receiver.stick_yaw = Stick(5.020,9.999,0,NON_DIRECTIONAL_MINUS); // 油门
+// PID控制器
+/* TODO
+Controller controller;
+*/
 // 电机初始化
 uint8_t motor_init_flag = 0;
 // 接收缓冲区
@@ -71,6 +66,21 @@ int main(void)
 }
 
 void Aircraft_Init(void) {
+  /* 控制层初始化，方便看所以写在前面 */
+  // 接收机
+  // 数据在2015.7.4凌晨测得
+  receiver.throttle_ = Stick(0.050542,0.09999,0,NEGATIVE_LOGIC);
+  receiver.yaw_ = Stick(0.050795,0.09999,0.75392, POSITIVE_LOGIC_BALANCED);
+  receiver.pitch_ = Stick(0.049995,0.099945,0.074946,POSITIVE_LOGIC_BALANCED);
+  receiver.roll_= Stick(0.049995,0.093991,0.068993,NEGATIVE_LOGIC_BALANCED);
+  // PID控制器
+  /* TODO
+  controller.pid_pitch = PID(,,,);
+  controller.pid_roll = PID(,,,);
+  controller.pid_yaw = PID(,,,);
+  */
+
+  // 底层初始化
   RxBuffer[0] = '\0';
   firstinputflag = 1;
   RxIndex = 0;
@@ -99,15 +109,7 @@ void Aircraft_Init(void) {
   tim_roll.mode_pwm_input(ROLL_PIN);
   // 调度器
   tim_sch.mode_sch();
-  // 接收机
-  /*
-  数据在2015.7.4凌晨测得
-  */
-  receiver.throttle_ = Stick(0.050542,0.09999,0,NEGATIVE_LOGIC);
-  receiver.yaw_ = Stick(0.050795,0.09999,0.75392, POSITIVE_LOGIC_BALANCED);
-  receiver.pitch_ = Stick(0.049995,0.099945,0.074946,POSITIVE_LOGIC_BALANCED);
-  receiver.roll_= Stick(0.049995,0.093991,0.068993,NEGATIVE_LOGIC_BALANCED);
-  // 油门最高点，听到确认音
+// 油门最高点，听到确认音
   motor1 = Motor(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN);
   motor2 = Motor(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN);
   motor3 = Motor(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN);
@@ -160,10 +162,11 @@ void TIM8_UP_TIM13_IRQHandler(void) {
   motor3.set_duty(receiver.throttle_.convert_duty_);
   motor4.set_duty(receiver.throttle_.convert_duty_);
 #endif
+#ifdef USING_CONTROLLER
+
+#endif
   }
 }
-
-
 
 // 接收机PWM占空比通过4个20mS中断读取
 void TIM2_IRQHandler(void) {

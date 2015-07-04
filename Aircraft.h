@@ -4,9 +4,20 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
+// define configs，宏定义设置
+
+//#define USING_CONTROLLER PID控制层写好后反注释这个
+
+#define _DEBUG_MPU6050 // 调试MPU6050
+//#define _DEBUG_MOTOR // 调试电机
+//#define _DEBUG_USART // 调试USART
+//#define _DEBUG_WITH_LCD // 在调试的时候使用LCD进行打印
+//#define _DEBUG_STICK // 调试遥控器的杆子（测PWM范围的时候用的）
+
+//#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞的时候需要反注释这个
+
 
 #define DELAY_1S 40000000
-
 #define PWM_FREQ 50
 // 宏定义
 // 信号接收定时器，引脚
@@ -34,7 +45,8 @@
 
 #define RXBUFFLE_SIZE 200
 
-#define SCHEDULER_TICK
+/* 这个宏定义很多文件都用到了，不要随便改！！！ */
+#define SCHEDULER_TICK 0.0005 // 调度器时间间隔，单位S
 
 void Aircraft_Init(void);
 void TIM2_IRQHandler(void);
