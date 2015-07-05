@@ -36,7 +36,7 @@ private:
   float yaw_setpoint_;
   // 测量的三个角度
   float measured_pitch_;
-  float measured_row_;
+  float measured_roll_;
   float measured_yaw_;
 
   // 控制器输出的电机的占空比，然后要接口给主函数中的Motor类（setduty）

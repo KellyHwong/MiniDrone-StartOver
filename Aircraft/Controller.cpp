@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Aircraft.h"
 #include "Controller.h"
+#include "Motor.h"
 #include "PID.h"
 
 #define MAX_ANGLE 8.333
@@ -19,7 +20,7 @@ Controller::Controller(void) {
   motor2_duty_ = 0;
   motor3_duty_ = 0;
   motor4_duty_ = 0;
-  
+
   pitch_setpoint_ = 0;
   roll_setpoint_ = 0;
   yaw_setpoint_ = 0;
@@ -37,7 +38,7 @@ Controller::Controller(float routine_freq, float scheduler_tick) {
   motor2_duty_ = 0;
   motor3_duty_ = 0;
   motor4_duty_ = 0;
-  
+
   pitch_setpoint_ = 0;
   roll_setpoint_ = 0;
   yaw_setpoint_ = 0;
@@ -54,9 +55,9 @@ void Controller::SetPoints(float pitch_unitized, float roll_unitized, float yaw_
 }
 
 // 输入现在的三个量，数据从传感器获得
-void Controller::SetMeasures(float measured_pitch, float measured_row, float measured_yaw) {
+void Controller::SetMeasures(float measured_pitch, float measured_roll, float measured_yaw) {
   measured_pitch_ = measured_pitch;
-  measured_row_ = measured_row;
+  measured_roll_ = measured_roll;
   measured_yaw_ = measured_yaw;
 }
 
@@ -66,7 +67,7 @@ void Controller::Routine(void) { // 控制器控制例程（用调度器调度�
   if (routine_counter_==routine_flag_int_) {
     // 三个PID计算例程
     pid_pitch.Routine(measured_pitch_);
-    pid_roll.Routine(measured_row_);
+    pid_roll.Routine(measured_roll_);
     pid_yaw.Routine(measured_yaw_);
     // 反馈量的获取，角度
     float pitch_out = pid_pitch.out();
@@ -85,8 +86,8 @@ void Controller::Routine(void) { // 控制器控制例程（用调度器调度�
 // 输入给Motor，）
     */
     float pitch_duty = pitch_out/MAX_ANGLE*MAX_DUTY_BEFORE_MUILTIPLIED_BY_K;
-    float roll_duty = roll_out/MAX_ANGLE*MAX_DUTY_BEFORE_MUILTIPLIED_BY_K;
-    float yaw_duty = yaw_out/MAX_ANGLE*MAX_DUTY_BEFORE_MUILTIPLIED_BY_K;
+    float roll_duty  = roll_out /MAX_ANGLE*MAX_DUTY_BEFORE_MUILTIPLIED_BY_K;
+    float yaw_duty   = yaw_out  /MAX_ANGLE*MAX_DUTY_BEFORE_MUILTIPLIED_BY_K;
     /*
     以油门为基准
     pitch 为正：3,4加；1,2减
@@ -97,7 +98,11 @@ void Controller::Routine(void) { // 控制器控制例程（用调度器调度�
     motor2_duty_ = throttle_ - pitch_duty + roll_duty - yaw_duty;
     motor3_duty_ = throttle_ + pitch_duty + roll_duty + yaw_duty;
     motor4_duty_ = throttle_ + pitch_duty - roll_duty - yaw_duty;
-    
+    // 太危险了,如果throttle不够,则认为不启动电机
+    if (throttle_ < MOTOR_STARTUP_DUTY) {
+      motor1_duty_ = motor2_duty_ = motor3_duty_ = motor4_duty_ = MIN_DUTY;
+    }
+
     /* 并把routine_counter置回1 */
     routine_counter_ = 1; // 1 才是执行完了的标志
   }

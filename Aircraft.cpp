@@ -1,5 +1,8 @@
 // 起~飞~
 //#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
+//#define PRINT_PRY // print the measured pitch row yaw
+//#define PRINT_STICK // 打印转换后的占空比
+#define PRINT_PITCH
 
 #include <stdio.h>
 #include <stdint.h>
@@ -25,7 +28,8 @@
 #include "usart.h"
 #include "delay.h"
 
-float pitch, roll, yaw, startup_yaw;
+float pitch, roll, yaw, startup_pitch, startup_roll, startup_yaw;
+float startup_pitch_convert_duty, startup_roll_convert_duty, startup_yaw_convert_duty;
 
 /* 全局变量声明 */
 // 4个通道捕获计时器
@@ -52,8 +56,8 @@ uint8_t RxBuffer[RXBUFFLE_SIZE];
 uint8_t firstinputflag;
 uint8_t RxIndex;
 // 运行时间计时
-uint32_t system_ticks;
-float system_seconds;
+uint32_t running_ticks;
+float running_seconds;
 
 int main(void)
 {
@@ -64,52 +68,75 @@ int main(void)
 	usart_configuration(UART4, 38400); // 蓝牙的波特率就是38400
 	usart_configuration(USART1, 115200);
   Aircraft_Init();
+#ifdef PRINT_CLOCK
 	printf("RCC_Clocks.SYSCLK_Frequency = %d\r\n", rcc_clocks.SYSCLK_Frequency);
 	printf("RCC_Clocks.HCLK_Frequency = %d\r\n", rcc_clocks.HCLK_Frequency);
 	printf("RCC_Clocks.PCLK1_Frequency = %d\r\n", rcc_clocks.PCLK1_Frequency);
 	printf("RCC_Clocks.PCLK2_Frequency = %d\r\n", rcc_clocks.PCLK2_Frequency);
+#endif
+
+
 
   uint8_t first_time = 1;
   while (1) {
     /* 读传感器数据在while里面读 这样数据才是最新的 */
     if(flag == 1){
       if(first_time) { // first time, init the startup_yaw
+        startup_pitch = pitch;
+        startup_roll = roll;
         startup_yaw = yaw;
         first_time = 0;
       } // first time, init the startup_yaw
 			flag = 0;
-			//printf("pitch=%6.3f, roll=%6.3f, startup_yaw=%6.3f\r\n", pitch, roll, yaw-startup_yaw);
-      controller.SetMeasures(pitch,roll,yaw-startup_yaw); // p, r, y
+      /* DEBUG 角度补偿 */
+      pitch -= startup_pitch;
+      roll -= startup_roll;
+      yaw -= startup_yaw;
+      controller.SetMeasures(pitch, roll ,
+        yaw); // p, r, y
 		}
-    // 油门通道捕获的真实的占空比
-    // throttle、yaw、roll、pitch通道捕获的真实的占空比
-
-    // 四个通道的占空比都是能获得的，并且是正确的
-    //printf("tim_throttle: %f   ",tim_throttle.DutyCycle);
-    //printf("tim_yaw: %f   ",tim_yaw.DutyCycle);
-    //printf("tim_roll: %f   ",tim_roll.DutyCycle);
-    //printf("tim_pitch: %f   ",tim_pitch.DutyCycle);
-
-    // 转换后的值，看看转换是不是对的
-    /* throttle和roll都是对的，pitch和yaw不对，why？
-    printf("receiver.throttle_.convert_duty_: %f   ",receiver.throttle_.convert_duty_);
-    printf("receiver.roll_.convert_duty_: %f   ",receiver.roll_.convert_duty_);
-    */
-    }
+  }
   return -1;
 }
 
 uint16_t USART_Flag = 0;
+uint8_t Fisrt_Print = 1;
 #define PRINTF_TICKS 200// 0.5mS per tick
 void USART_Routine(void) {
   USART_Flag ++;
   if (USART_Flag==PRINTF_TICKS) { // USART_Routine
+    /* DEBUG 转换的DUTY没问题，roll stick 的平衡点是0.00004 */
+    /*
     printf("tim_roll: %f   ",tim_roll.DutyCycle);
     receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
     printf("receiver.roll_.convert_duty_: %f   ",receiver.roll_.convert_duty_);
-    //printf("set motor1 duty: %f   ", motor1.duty());
-    /* 没问题，是好的，按照这个格式打印CSV*/
-    //printf("%f,%f\r\n",system_seconds,motor1.duty());
+    */
+#ifdef PRINT_PRY
+    if (Fisrt_Print) {
+      Fisrt_Print = 0;
+      printf("seconds,pitch,roll,yaw\r\n");
+    }
+    printf("%f, %6.3f, %6.3f, %6.3f\r\n", running_seconds, pitch, roll, yaw);
+#endif
+#ifdef PRINT_STICK
+    if (Fisrt_Print) {
+      Fisrt_Print = 0;
+      printf("seconds,pitch_stick,roll_stick,yaw_stick\r\n");
+    }
+    printf("%f, %6.3f, %6.3f, %6.3f\r\n", running_seconds,
+      receiver.pitch_.convert_duty_,
+      receiver.roll_.convert_duty_,
+      receiver.yaw_.convert_duty_);
+#endif
+#ifdef PRINT_PITCH
+    if (Fisrt_Print) {
+      Fisrt_Print = 0;
+      printf("seconds,pitch_setpoint,pitch_measured\r\n");
+      printf("seconds,roll_setpoint,roll_measured\r\n");
+    }
+    printf("%f, %f, %f\r\n", running_seconds, controller.pid_pitch.setpoint(), pitch);
+    printf("%f, %f, %f\r\n", running_seconds, controller.pid_roll.setpoint(), roll);
+#endif
     USART_Flag = 1;
   } // USART_Routine
 }
@@ -172,8 +199,8 @@ void Aircraft_Init(void) {
   GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStructure);
   GPIO_ResetBits(LED4_GPIO_PORT,LED4_PIN);
   // 运行时间计时
-  system_ticks = 0;
-  system_seconds = 0.0;
+  running_ticks = 0;
+  running_seconds = 0.0;
 
   /* 控制层初始化 */
   Receiver_Init(); // 接收机
@@ -187,8 +214,8 @@ void Aircraft_Init(void) {
 void TIM8_UP_TIM13_IRQHandler(void) {
   TIM_ClearITPendingBit(tim_sch.TIM, TIM_IT_Update);
   if (Aircraft_Init_Flag) { // if Aircraft_Init_Flag 只有当初始化全部完成才进行调度
-    system_ticks ++;
-    system_seconds = SCHEDULER_TICK * system_ticks;
+    running_ticks ++;
+    running_seconds = SCHEDULER_TICK * running_ticks;
     Receive_Flag ++; // Receiver Routine Flag
     if (Receive_Flag == RECEIVE_TICK) { // 15mS调度一次
       receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
@@ -207,7 +234,7 @@ void TIM8_UP_TIM13_IRQHandler(void) {
     } // 15mS调度一次
 
     // 陀螺仪接口在主函数里面
-    // controller.SetMeasures(pitch,roll,yaw-startup_yaw); // p, r, y
+    // controller.SetMeasures(pitch,roll,yaw); // p, r, y
     controller.Routine(); // 3路PID控制计算，里面会自动分频
     if (controller.IsExecuted()) {
       float m1d = controller.motor1_duty();
@@ -221,59 +248,21 @@ void TIM8_UP_TIM13_IRQHandler(void) {
     }
     /* 打印例程 */
     USART_Routine();
-#ifdef _DEBUG_MOTOR
-    // 输入给电机的是转换之后的占空比
-    motor1.set_duty(receiver.throttle_.convert_duty_);
-    motor2.set_duty(receiver.throttle_.convert_duty_);
-    motor3.set_duty(receiver.throttle_.convert_duty_);
-    motor4.set_duty(receiver.throttle_.convert_duty_);
-#endif
   } // if Aircraft_Init_Flag
 }
 
 // 接收机PWM占空比通过4个20mS中断读取
 void TIM2_IRQHandler(void) {
   tim_throttle.PWM_Input_Handler();
-#ifdef _DEBUG_WITH_LCD
-  uint8_t tmp2[80];
-  uint8_t tmp3[80];
-  float_to_string(tim_throttle.DutyCycle,tmp2);
-  float_to_string(receiver.throttle_.convert_duty_,tmp3);
-  uint8_t tmp1[80] = "throttle:";
-  GUI_Text(0,0,tmp1,White,Blue);
-  GUI_Text(0,LCD_LINE_SPACE,tmp2,White,Blue);
-  GUI_Text(0,2*LCD_LINE_SPACE,tmp3  ,White,Blue);
-#endif
 }
 void TIM3_IRQHandler(void) {
   tim_pitch.PWM_Input_Handler();
-#ifdef _DEBUG_WITH_LCD
-  uint8_t tmp2[80];
-  float_to_string(tim_pitch.DutyCycle,tmp2);
-  uint8_t tmp1[80] = "pitch:";
-  GUI_Text(0,2*LCD_LINE_SPACE,tmp1,White,Blue);
-  GUI_Text(0,3*LCD_LINE_SPACE,tmp2,White,Blue);
-#endif
 }
 void TIM4_IRQHandler(void) {
   tim_yaw.PWM_Input_Handler();
-#ifdef _DEBUG_WITH_LCD
-  uint8_t tmp2[80];
-  float_to_string(tim_yaw.DutyCycle,tmp2);
-  uint8_t tmp1[80] = "yaw:";
-  GUI_Text(0,4*LCD_LINE_SPACE,tmp1,White,Blue);
-  GUI_Text(0,5*LCD_LINE_SPACE,tmp2,White,Blue);
-#endif
 }
 void TIM5_IRQHandler(void) {
   tim_roll.PWM_Input_Handler();
-#ifdef _DEBUG_WITH_LCD
-  uint8_t tmp2[80];
-  float_to_string(tim_roll.DutyCycle,tmp2);
-  uint8_t tmp1[80] = "roll:";
-  GUI_Text(0,6*LCD_LINE_SPACE,tmp1,White,Blue);
-  GUI_Text(0,7*LCD_LINE_SPACE,tmp2,White,Blue);
-#endif
 }
 
 /*
@@ -335,7 +324,7 @@ void Receiver_Init(void) {
 
 void Controller_Init(void) {
   controller = Controller(CONTROL_FREQ, SCHEDULER_TICK);
-  float dt = 1.0 / CONTROL_FREQ;
+  float dt = 1.0 / CONTROL_FREQ; // 频率分之1
   controller.pid_pitch = PID(PID_PITCH_KP,PID_PITCH_KI,PID_PITCH_KD,dt,-MAX_I_ABS,MAX_I_ABS);
   controller.pid_roll = PID(PID_ROLL_KP,PID_ROLL_KI,PID_ROLL_KD,dt,-MAX_I_ABS,MAX_I_ABS);
   controller.pid_yaw = PID(PID_YAW_KP,PID_YAW_KI,PID_YAW_KD,dt,-MAX_I_ABS,MAX_I_ABS);
