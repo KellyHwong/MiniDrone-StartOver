@@ -62,8 +62,8 @@ void Timer::mode_pwm_input(PinTypedef p) {
   NVIC_InitTypeDef NVIC_InitStructure;  // 中断初始化器
   NVIC_InitStructure.NVIC_IRQChannel = this->IRQn;
   // 低频高优先级原则，20mS的捕获中断设为最高优先级
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; // IRQ 通道使能
   NVIC_Init(&NVIC_InitStructure);
 
@@ -184,8 +184,8 @@ void Timer::mode_sch(void) {
   NVIC_InitTypeDef NVIC_InitStructure;  // 中断初始化器
   NVIC_InitStructure.NVIC_IRQChannel = this->IRQn;
   // 低频高优先级原则，20mS的捕获中断设为最高优先级
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1; // 比PWM捕获器小一级
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2; // 比PWM捕获器小一级
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; // IRQ 通道使能
   NVIC_Init(&NVIC_InitStructure);
   

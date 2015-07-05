@@ -1,3 +1,6 @@
+// 起~飞~
+//#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
+
 #include <stdio.h>
 #include <stdint.h>
 #include "stm32f4xx.h"
@@ -6,16 +9,23 @@
 
 #include "Aircraft.h"
 #include "Controller.h"
-#include "Delay.h"
 #include "Formatter.h"
 #include "LCD.h"
 #include "Motor.h"
 #include "MPU6050.h"
+#include "myDelay.h"
 #include "PID.h"
 #include "Receiver.h"
 #include "Stick.h"
 #include "Timer.h"
 #include "usart.h"
+
+#include "stm32f4xx.h"
+#include "util.h"
+#include "usart.h"
+#include "delay.h"
+
+float pitch, roll, yaw, startup_yaw;
 
 /* 全局变量声明 */
 // 4个通道捕获计时器
@@ -34,9 +44,7 @@ Timer tim_sch(SCH_TIM);
 uint16_t Receive_Flag;
 Receiver receiver;
 // PID控制器
-#ifdef USING_CONTROLLER
 Controller controller;
-#endif
 // 电机初始化标志
 uint8_t Aircraft_Init_Flag = 0;
 // 接收缓冲区
@@ -49,18 +57,30 @@ float system_seconds;
 
 int main(void)
 {
+  MPU6050_NVIC_Configuration();
+  nvic_grouping(2);
+	rcc_configuration();
+	delay_configuration();
+	usart_configuration(UART4, 38400); // 蓝牙的波特率就是38400
+	usart_configuration(USART1, 115200);
   Aircraft_Init();
-  while (1)
-  {
-#ifdef _DEBUG_MPU6050
-    MPU6050_TEST();
-#endif
-#ifdef _DEBUG_MOTOR
-    Delay(DELAY_1S/5);
-    printf("throttle_convert: %f   ",receiver.throttle_.convert_duty_);
-#endif
-#ifdef _DEBUG_STICK
-    Delay(DELAY_1S/2);
+	printf("RCC_Clocks.SYSCLK_Frequency = %d\r\n", rcc_clocks.SYSCLK_Frequency);
+	printf("RCC_Clocks.HCLK_Frequency = %d\r\n", rcc_clocks.HCLK_Frequency);
+	printf("RCC_Clocks.PCLK1_Frequency = %d\r\n", rcc_clocks.PCLK1_Frequency);
+	printf("RCC_Clocks.PCLK2_Frequency = %d\r\n", rcc_clocks.PCLK2_Frequency);
+
+  uint8_t first_time = 1;
+  while (1) {
+    /* 读传感器数据在while里面读 这样数据才是最新的 */
+    if(flag == 1){
+      if(first_time) { // first time, init the startup_yaw
+        startup_yaw = yaw;
+        first_time = 0;
+      } // first time, init the startup_yaw
+			flag = 0;
+			//printf("pitch=%6.3f, roll=%6.3f, startup_yaw=%6.3f\r\n", pitch, roll, yaw-startup_yaw);
+      controller.SetMeasures(pitch,roll,yaw-startup_yaw); // p, r, y
+		}
     // 油门通道捕获的真实的占空比
     // throttle、yaw、roll、pitch通道捕获的真实的占空比
 
@@ -75,15 +95,23 @@ int main(void)
     printf("receiver.throttle_.convert_duty_: %f   ",receiver.throttle_.convert_duty_);
     printf("receiver.roll_.convert_duty_: %f   ",receiver.roll_.convert_duty_);
     */
-    printf("tim_yaw: %f   ",tim_yaw.DutyCycle);
-    printf("tim_pitch: %f   ",tim_pitch.DutyCycle);
-    receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
-    //receiver.update_data(0.05, 0.07,0.08,0.10);
-    printf("receiver.yaw_.convert_duty_: %f   ",receiver.yaw_.convert_duty_);
-    printf("receiver.pitch_.convert_duty_: %f   ",receiver.pitch_.convert_duty_);
-#endif
-	}
+    }
   return -1;
+}
+
+uint16_t USART_Flag = 0;
+#define PRINTF_TICKS 200// 0.5mS per tick
+void USART_Routine(void) {
+  USART_Flag ++;
+  if (USART_Flag==PRINTF_TICKS) { // USART_Routine
+    printf("tim_roll: %f   ",tim_roll.DutyCycle);
+    receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
+    printf("receiver.roll_.convert_duty_: %f   ",receiver.roll_.convert_duty_);
+    //printf("set motor1 duty: %f   ", motor1.duty());
+    /* 没问题，是好的，按照这个格式打印CSV*/
+    //printf("%f,%f\r\n",system_seconds,motor1.duty());
+    USART_Flag = 1;
+  } // USART_Routine
 }
 
 void Aircraft_Init(void) {
@@ -91,7 +119,7 @@ void Aircraft_Init(void) {
   RxBuffer[0] = '\0';
   firstinputflag = 1;
   RxIndex = 0;
-  Init_MPU6050(); // 陀螺仪
+  //Init_MPU6050(); // 陀螺仪
 
   GPIO_InitTypeDef  GPIO_InitStructure;
   // LCD
@@ -119,8 +147,8 @@ void Aircraft_Init(void) {
   motor4 = Motor(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN);
   // 电调接上电池，等待2S
 #ifdef INIT_MOTOR
-  Delay(DELAY_1S);
-  Delay(DELAY_1S);
+  myDelay(DELAY_1S);
+  myDelay(DELAY_1S);
 #endif
   // 油门推到最低，等待1S
   motor1.set_duty(MIN_DUTY);
@@ -128,9 +156,9 @@ void Aircraft_Init(void) {
   motor3.set_duty(MIN_DUTY);
   motor4.set_duty(MIN_DUTY);
 #ifdef INIT_MOTOR
-  Delay(DELAY_1S);
-  Delay(DELAY_1S);
-  Delay(DELAY_1S); // 油门最低点确认音，可以起飞
+  myDelay(DELAY_1S);
+  myDelay(DELAY_1S);
+  myDelay(DELAY_1S); // 油门最低点确认音，可以起飞
 #endif
   // 调度器
   tim_sch.mode_sch();
@@ -146,25 +174,13 @@ void Aircraft_Init(void) {
   // 运行时间计时
   system_ticks = 0;
   system_seconds = 0.0;
-  
+
   /* 控制层初始化 */
   Receiver_Init(); // 接收机
   Controller_Init(); // 3通道PID控制器
 
   /* 全部初始化完成 */
   Aircraft_Init_Flag = 1;
-}
-
-uint16_t USART_Flag = 0;
-#define PRINTF_TICKS 1000// 0.5mS per tick
-void USART_Routine(void) {
-  USART_Flag ++;
-  if (USART_Flag==PRINTF_TICKS) { // USART_Routine
-    //printf("set motor1 duty: %f   ", motor1.duty());
-    /* 没问题，是好的，按照这个格式打印CSV*/
-    printf("%f,%f\r\n",system_seconds,motor1.duty());
-    USART_Flag = 1;
-  } // USART_Routine
 }
 
 // 调度器 SCH ，每次0.5mS
@@ -177,7 +193,6 @@ void TIM8_UP_TIM13_IRQHandler(void) {
     if (Receive_Flag == RECEIVE_TICK) { // 15mS调度一次
       receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
       //printf("receiver.yaw_.convert_duty_: %f   ",receiver.yaw_.convert_duty_); // 测试定时器时间准不准用的
-#ifdef USING_CONTROLLER
       // 获取油门大小
       controller.throttle(receiver.throttle_.convert_duty_); // 输入油门，0.05~0.10
       /*
@@ -188,13 +203,11 @@ void TIM8_UP_TIM13_IRQHandler(void) {
       controller.SetPoints(receiver.pitch_.convert_duty_,\
         receiver.roll_.convert_duty_,\
         receiver.yaw_.convert_duty_); // pitch, roll, yaw
-#endif
       Receive_Flag = 1;
     } // 15mS调度一次
-    
-#ifdef USING_CONTROLLER
-    // TODO，传感器接口还没有写好
-    controller.SetMeasures(0,0,0); // p, r, y
+
+    // 陀螺仪接口在主函数里面
+    // controller.SetMeasures(pitch,roll,yaw-startup_yaw); // p, r, y
     controller.Routine(); // 3路PID控制计算，里面会自动分频
     if (controller.IsExecuted()) {
       float m1d = controller.motor1_duty();
@@ -206,7 +219,6 @@ void TIM8_UP_TIM13_IRQHandler(void) {
       motor3.set_duty(m3d);
       motor4.set_duty(m4d);
     }
-#endif
     /* 打印例程 */
     USART_Routine();
 #ifdef _DEBUG_MOTOR

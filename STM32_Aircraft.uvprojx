@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F4XX,__FPU_PRESENT=1,__FPU_USED =1</Define>
               <Undefine></Undefine>
-              <IncludePath>.\;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery;.\Utilities;.\Drivers;.\Misc;.\Aircraft</IncludePath>
+              <IncludePath>.\;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\CMSIS\ST\STM32F4xx\Include;..\STM32F4-Discovery_FW_V1.1.0\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\STM32F4-Discovery_FW_V1.1.0\Utilities\STM32F4-Discovery;.\Utilities;.\Drivers;.\Misc;.\Aircraft;.\Modules;.\User</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -518,11 +518,6 @@
               <FileType>1</FileType>
               <FilePath>.\Drivers\IIC.c</FilePath>
             </File>
-            <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Drivers\usart.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -543,25 +538,20 @@
               <FileType>8</FileType>
               <FilePath>.\Utilities\AsciiLib.cpp</FilePath>
             </File>
-            <File>
-              <FileName>MPU6050.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Utilities\MPU6050.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Misc</GroupName>
           <Files>
             <File>
-              <FileName>Delay.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Misc\Delay.cpp</FilePath>
-            </File>
-            <File>
               <FileName>Formatter.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Misc\Formatter.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>myDelay.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Misc\myDelay.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -577,6 +567,41 @@
               <FileName>Stick.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Aircraft\Stick.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Controller.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Aircraft\Controller.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>PID.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Aircraft\PID.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Modules</GroupName>
+          <Files>
+            <File>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modules\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modules\usart.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>User</GroupName>
+          <Files>
+            <File>
+              <FileName>util.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\util.c</FilePath>
             </File>
           </Files>
         </Group>

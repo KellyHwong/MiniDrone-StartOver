@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include "Misc/Delay.h"
+#include "myDelay.h"
 
-void  Delay (uint32_t nCount)
+void  myDelay (uint32_t nCount)
 {
   for(; nCount != 0; nCount--);
 }

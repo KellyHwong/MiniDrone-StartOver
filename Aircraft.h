@@ -11,13 +11,13 @@
 //#define _DEBUG_MPU6050 // 调试MPU6050
 
 // 调试电机和初始化电机要一起注释/反注释
-#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
+
 //#define _DEBUG_MOTOR // 调试电机
 
 //#define _DEBUG_USART // 调试USART
 //#define _DEBUG_WITH_LCD // 在调试的时候使用LCD进行打印
 //#define _DEBUG_STICK // 调试遥控器的杆子（测PWM范围的时候用的）
-#define USING_CONTROLLER // 调试PID控制器
+
 
 /* 应用层和控制层宏定义 */
 #define RECEIVE_TICK 30 // 30，就是15mS一次

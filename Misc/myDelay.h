@@ -1,14 +1,14 @@
-#ifndef DELAY_H_
-#define DELAY_H_
+#ifndef MY_DELAY_H_
+#define MY_DELAY_H_
 #ifdef __cplusplus
  extern "C" {
-#endif 
- 
+#endif
+
 
 
 #include <stdint.h>
 
-void  Delay (uint32_t nCount);
+void  myDelay (uint32_t nCount);
 
 #ifdef __cplusplus
 }

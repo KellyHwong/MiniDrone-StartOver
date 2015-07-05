@@ -1,10 +1,10 @@
 /*********************************************************************************************************
 *
 * File                : LCD.h
-* Hardware Environment: 
+* Hardware Environment:
 * Build Environment   : RealView MDK-ARM  Version: 4.20
 * Version             : V1.0
-* By                  : 
+* By                  :
 *
 *                                  (c) Copyright 2005-2011, WaveShare
 *                                       http://www.waveshare.net
@@ -12,20 +12,20 @@
 *
 *********************************************************************************************************/
 
-#ifndef __GLCD_H 
+#ifndef __GLCD_H
 #define __GLCD_H
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
- 
+#endif
+
 
 
 /* Includes ------------------------------------------------------------------*/
 #include <math.h>
 #include "stm32f4xx.h"
 #include "config.h"
-#include "Utilities/AsciiLib.h" 
+#include "Utilities/AsciiLib.h"
 
 // defined by Kelly
 #define LCD_LINE_SPACE 16
@@ -50,12 +50,12 @@
 #if  ( DISP_ORIENTATION == 90 ) || ( DISP_ORIENTATION == 270 )
 
 #define  MAX_X  320
-#define  MAX_Y  240   
+#define  MAX_Y  240
 
 #elif  ( DISP_ORIENTATION == 0 ) || ( DISP_ORIENTATION == 180 )
 
 #define  MAX_X  240
-#define  MAX_Y  320   
+#define  MAX_Y  320
 
 #endif
 
@@ -76,7 +76,7 @@
 //#define DISP_VER_FRONT_PORCH		4	  /* 4 */
 
 /*********************************************************************
-* Definition for SPI interface for HIMAX 8238-A relevant to hardware 
+* Definition for SPI interface for HIMAX 8238-A relevant to hardware
 * layout; Hardware dependent!
 *********************************************************************/
 #define GPIO3 3
@@ -104,15 +104,15 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void LCD_Initializtion(void);
-void LCD_Clear(uint16_t Color);	
+void LCD_Clear(uint16_t Color);
 //void LCD_SetBacklight(uint8_t intensity);
 uint16_t LCD_GetPoint(uint16_t Xpos,uint16_t Ypos);
 void LCD_SetPoint(uint16_t Xpos,uint16_t Ypos,uint16_t point);
 void PutChar(uint16_t Xpos,uint16_t Ypos,uint8_t c,uint16_t charColor,uint16_t bkColor);
 void LCD_DrawLine( uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1 , uint16_t color );
-void PutChinese(uint16_t Xpos,uint16_t Ypos,uint8_t *str,uint16_t Color,uint16_t bkColor); 
+void PutChinese(uint16_t Xpos,uint16_t Ypos,uint8_t *str,uint16_t Color,uint16_t bkColor);
 void GUI_Text(uint16_t Xpos, uint16_t Ypos, uint8_t *str,uint16_t Color, uint16_t bkColor);
-void GUI_Chinese(uint16_t Xpos, uint16_t Ypos, uint8_t *str,uint16_t Color, uint16_t bkColor);	
+void GUI_Chinese(uint16_t Xpos, uint16_t Ypos, uint8_t *str,uint16_t Color, uint16_t bkColor);
 void LCD_DrawPicture(uint16_t StartX,uint16_t StartY,uint16_t EndX,uint16_t EndY,uint16_t *pic);
 
 
@@ -122,7 +122,7 @@ __inline uint16_t LCD_ReadData(void);
 __inline uint16_t LCD_ReadReg(uint16_t LCD_Reg);
 __inline void LCD_WriteReg(uint16_t LCD_Reg,uint16_t LCD_RegValue);
 static void LCD_SetCursor( uint16_t Xpos, uint16_t Ypos );
-void delay_ms(uint16_t ms);
+void lcd_delay_ms(uint16_t ms);
 
 #ifdef __cplusplus
 }
