@@ -70,15 +70,15 @@ void PID::EvalOut(void) {
   out_ = pout_ + iout_ + dout_;
 }
 
-// PID的一次例程，要输入测量的数据，感觉这么些不好
-inline void PID::Routine(float measured) {
-  EvalError(measured); // 计算误差
+// PID的一次例程，要输入测量的数据，感觉这么写不好
+void PID::Routine(float measured_) {
+  EvalError(measured_); // 计算误差
   EvalOut(); // 计算输出
 }
 
 // setter functions
 // 设置setpoint
-inline void PID::setpoint(float sp) {
+void PID::setpoint(float sp) {
   setpoint_ = sp;
 }
 // 设置积分限幅
@@ -96,16 +96,19 @@ inline void PID::limit_i() {
   }
 }
 // getter functions
-inline float PID::pout(void) {
+float PID::setpoint(void) {
+  return setpoint_;
+}
+float PID::pout(void) {
   return pout_;
 }
-inline float PID::iout(void) {
+float PID::iout(void) {
   return iout_;
 }
 
-inline float PID::dout(void) {
+float PID::dout(void) {
   return dout_;
 }
-inline float PID::out(void) {
+float PID::out(void) {
   return out_;
 }

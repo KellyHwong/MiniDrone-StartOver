@@ -11,7 +11,7 @@
 //#define _DEBUG_MPU6050 // 调试MPU6050
 
 // 调试电机和初始化电机要一起注释/反注释
-//#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
+#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
 //#define _DEBUG_MOTOR // 调试电机
 
 //#define _DEBUG_USART // 调试USART
@@ -21,7 +21,7 @@
 
 /* 应用层和控制层宏定义 */
 #define RECEIVE_TICK 30 // 30，就是15mS一次
-#define CONTROL_FREQ 1//114 // 控制器调度频率，单位Hz
+#define CONTROL_FREQ 114// 控制器调度频率，单位Hz
 // PID参数
 #define PID_ROLL_KP 3.3
 #define PID_ROLL_KI 0.0
@@ -86,6 +86,7 @@ void TIM4_IRQHandler(void);
 void TIM5_IRQHandler(void);
 void TIM8_UP_TIM13_IRQHandler(void);
 void USART3_IRQHandler(void);
+void USART_Routine(void);
 
 #ifdef __cplusplus
 }

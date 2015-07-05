@@ -31,9 +31,9 @@ private:
   uint8_t routine_flag_int_;
   uint8_t routine_counter_;
   // 设置的三个角度
-  float set_pitch_;
-  float set_row_;
-  float set_yaw_;
+  float pitch_setpoint_;
+  float roll_setpoint_;
+  float yaw_setpoint_;
   // 测量的三个角度
   float measured_pitch_;
   float measured_row_;
@@ -52,15 +52,15 @@ public:
   PID pid_yaw;
   Controller();
   Controller(float routine_freq, float scheduler_tick);
-  inline void SetPoints(float p, float r, float y);
-  inline void SetMeasures(float measured_pitch, float measured_row, float measured_yaw);
+  void SetPoints(float p, float r, float y);
+  void SetMeasures(float measured_pitch, float measured_row, float measured_yaw);
   void Routine(void); // 控制器控制例程（用调度器调度）
-  inline uint8_t IsExecuted(void);// 返回给调度器
-  inline float motor1_duty(void);
-  inline float motor2_duty(void);
-  inline float motor3_duty(void);
-  inline float motor4_duty(void);
-  inline void throttle(float th);
+  uint8_t IsExecuted(void);// 返回给调度器
+  float motor1_duty(void);
+  float motor2_duty(void);
+  float motor3_duty(void);
+  float motor4_duty(void);
+  void throttle(float th);
 }; // class Stick
 
 #ifdef __cplusplus

@@ -37,13 +37,15 @@ Receiver receiver;
 #ifdef USING_CONTROLLER
 Controller controller;
 #endif
-// 电机初始化
+// 电机初始化标志
 uint8_t Aircraft_Init_Flag = 0;
 // 接收缓冲区
-
 uint8_t RxBuffer[RXBUFFLE_SIZE];
 uint8_t firstinputflag;
 uint8_t RxIndex;
+// 运行时间计时
+uint32_t system_ticks;
+float system_seconds;
 
 int main(void)
 {
@@ -80,10 +82,6 @@ int main(void)
     printf("receiver.yaw_.convert_duty_: %f   ",receiver.yaw_.convert_duty_);
     printf("receiver.pitch_.convert_duty_: %f   ",receiver.pitch_.convert_duty_);
 #endif
-    /*
-    Delay(DELAY_1S/2);
-    printf("%s",RxBuffer);
-    */
 	}
   return -1;
 }
@@ -145,7 +143,10 @@ void Aircraft_Init(void) {
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStructure);
   GPIO_ResetBits(LED4_GPIO_PORT,LED4_PIN);
-
+  // 运行时间计时
+  system_ticks = 0;
+  system_seconds = 0.0;
+  
   /* 控制层初始化 */
   Receiver_Init(); // 接收机
   Controller_Init(); // 3通道PID控制器
@@ -154,15 +155,28 @@ void Aircraft_Init(void) {
   Aircraft_Init_Flag = 1;
 }
 
+uint16_t USART_Flag = 0;
+#define PRINTF_TICKS 1000// 0.5mS per tick
+void USART_Routine(void) {
+  USART_Flag ++;
+  if (USART_Flag==PRINTF_TICKS) { // USART_Routine
+    //printf("set motor1 duty: %f   ", motor1.duty());
+    /* 没问题，是好的，按照这个格式打印CSV*/
+    printf("%f,%f\r\n",system_seconds,motor1.duty());
+    USART_Flag = 1;
+  } // USART_Routine
+}
+
 // 调度器 SCH ，每次0.5mS
 void TIM8_UP_TIM13_IRQHandler(void) {
   TIM_ClearITPendingBit(tim_sch.TIM, TIM_IT_Update);
-  if (Aircraft_Init_Flag) { // 只有当初始化全部完成才进行调度
-    Receive_Flag ++;
-    if (Receive_Flag == RECEIVE_TICK) {
+  if (Aircraft_Init_Flag) { // if Aircraft_Init_Flag 只有当初始化全部完成才进行调度
+    system_ticks ++;
+    system_seconds = SCHEDULER_TICK * system_ticks;
+    Receive_Flag ++; // Receiver Routine Flag
+    if (Receive_Flag == RECEIVE_TICK) { // 15mS调度一次
       receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
       //printf("receiver.yaw_.convert_duty_: %f   ",receiver.yaw_.convert_duty_); // 测试定时器时间准不准用的
-      Receive_Flag = 1;
 #ifdef USING_CONTROLLER
       // 获取油门大小
       controller.throttle(receiver.throttle_.convert_duty_); // 输入油门，0.05~0.10
@@ -175,19 +189,26 @@ void TIM8_UP_TIM13_IRQHandler(void) {
         receiver.roll_.convert_duty_,\
         receiver.yaw_.convert_duty_); // pitch, roll, yaw
 #endif
-    }
+      Receive_Flag = 1;
+    } // 15mS调度一次
+    
 #ifdef USING_CONTROLLER
     // TODO，传感器接口还没有写好
-    controller.GetMeasures(0,0,0); // p, r, y
-    controller.ControlRoutine(); // 3路PID控制计算，里面会自动分频
+    controller.SetMeasures(0,0,0); // p, r, y
+    controller.Routine(); // 3路PID控制计算，里面会自动分频
     if (controller.IsExecuted()) {
-      motor1.set_duty(controller.motor1_duty());
-      motor2.set_duty(controller.motor2_duty());
-      motor3.set_duty(controller.motor3_duty());
-      motor4.set_duty(controller.motor4_duty());
+      float m1d = controller.motor1_duty();
+      float m2d = controller.motor2_duty();
+      float m3d = controller.motor3_duty();
+      float m4d = controller.motor4_duty();
+      motor1.set_duty(m1d);
+      motor2.set_duty(m2d);
+      motor3.set_duty(m3d);
+      motor4.set_duty(m4d);
     }
 #endif
-
+    /* 打印例程 */
+    USART_Routine();
 #ifdef _DEBUG_MOTOR
     // 输入给电机的是转换之后的占空比
     motor1.set_duty(receiver.throttle_.convert_duty_);
@@ -195,7 +216,7 @@ void TIM8_UP_TIM13_IRQHandler(void) {
     motor3.set_duty(receiver.throttle_.convert_duty_);
     motor4.set_duty(receiver.throttle_.convert_duty_);
 #endif
-  }
+  } // if Aircraft_Init_Flag
 }
 
 // 接收机PWM占空比通过4个20mS中断读取
@@ -301,13 +322,11 @@ void Receiver_Init(void) {
 }
 
 void Controller_Init(void) {
-#ifdef USING_CONTROLLER
   controller = Controller(CONTROL_FREQ, SCHEDULER_TICK);
   float dt = 1.0 / CONTROL_FREQ;
   controller.pid_pitch = PID(PID_PITCH_KP,PID_PITCH_KI,PID_PITCH_KD,dt,-MAX_I_ABS,MAX_I_ABS);
   controller.pid_roll = PID(PID_ROLL_KP,PID_ROLL_KI,PID_ROLL_KD,dt,-MAX_I_ABS,MAX_I_ABS);
   controller.pid_yaw = PID(PID_YAW_KP,PID_YAW_KI,PID_YAW_KD,dt,-MAX_I_ABS,MAX_I_ABS);
-#endif
 }
 
 

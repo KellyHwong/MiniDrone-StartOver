@@ -50,15 +50,16 @@ class PID {
   PID();
   PID(float Kp, float Ki, float Kd, float dt);
   PID(float Kp, float Ki, float Kd, float dt, float imin, float imax);
-  inline void Routine(float measured_);
+  void Routine(float measured_);
   void setpid(float Kp, float Ki, float Kd);
-  inline void set_i_limit(float imin, float imax);
-  inline void setpoint(float sp);
+  void set_i_limit(float imin, float imax);
+  void setpoint(float sp);
   // get输出
-  inline float pout(void);
-  inline float iout(void);
-  inline float dout(void);
-  inline float out(void);
+  float setpoint(void);
+  float pout(void);
+  float iout(void);
+  float dout(void);
+  float out(void);
 }; // class PID
 
 #ifdef __cplusplus

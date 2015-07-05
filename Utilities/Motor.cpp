@@ -34,6 +34,6 @@ void Motor::set_duty(float duty) {
   pwm_.set_duty(duty_);
 }
 
-float Motor::get_duty(void) {
+float Motor::duty(void) {
   return duty_;
 }

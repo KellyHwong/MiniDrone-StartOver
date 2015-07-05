@@ -28,7 +28,7 @@ class Motor {
   Motor();
   Motor(uint32_t freq, float duty, uint8_t TIM_No, uint8_t CH_No,PinTypedef pin);
   void set_duty(float duty);
-  float get_duty(void);
+  float duty(void);
 }; // class Motor
 
 #ifdef __cplusplus
