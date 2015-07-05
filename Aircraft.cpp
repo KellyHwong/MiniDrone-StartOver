@@ -68,14 +68,11 @@ int main(void)
 	usart_configuration(UART4, 38400); // 蓝牙的波特率就是38400
 	usart_configuration(USART1, 115200);
   Aircraft_Init();
-#ifdef PRINT_CLOCK
-	printf("RCC_Clocks.SYSCLK_Frequency = %d\r\n", rcc_clocks.SYSCLK_Frequency);
-	printf("RCC_Clocks.HCLK_Frequency = %d\r\n", rcc_clocks.HCLK_Frequency);
-	printf("RCC_Clocks.PCLK1_Frequency = %d\r\n", rcc_clocks.PCLK1_Frequency);
-	printf("RCC_Clocks.PCLK2_Frequency = %d\r\n", rcc_clocks.PCLK2_Frequency);
-#endif
 
-
+  myDelay(DELAY_1S);
+  startup_pitch_convert_duty = receiver.pitch_.convert_duty_;
+  startup_roll_convert_duty = receiver.roll_.convert_duty_;
+  startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
 
   uint8_t first_time = 1;
   while (1) {
@@ -88,7 +85,7 @@ int main(void)
         first_time = 0;
       } // first time, init the startup_yaw
 			flag = 0;
-      /* DEBUG 角度补偿 */
+      /* DEBUG 角度校准 */
       pitch -= startup_pitch;
       roll -= startup_roll;
       yaw -= startup_yaw;
@@ -227,9 +224,9 @@ void TIM8_UP_TIM13_IRQHandler(void) {
         ROLL，-1~+1，向右下为正，向左下为负（很好理解，因为是右手系）
         YAW，-1~+1，逆时针/向左为正，顺时针/向右为负
       */
-      controller.SetPoints(receiver.pitch_.convert_duty_,\
-        receiver.roll_.convert_duty_,\
-        receiver.yaw_.convert_duty_); // pitch, roll, yaw
+      controller.SetPoints(receiver.pitch_.convert_duty_ - startup_pitch_convert_duty,\
+        receiver.roll_.convert_duty_ - startup_roll_convert_duty,\
+        receiver.yaw_.convert_duty_ - startup_yaw_convert_duty); // pitch, roll, yaw
       Receive_Flag = 1;
     } // 15mS调度一次
 

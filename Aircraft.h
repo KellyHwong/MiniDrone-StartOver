@@ -27,9 +27,9 @@
 #define PID_ROLL_KI 0.0
 #define PID_ROLL_KD 1.0
 
-#define PID_PITCH_KP 3.3
+#define PID_PITCH_KP 0.0//3.3
 #define PID_PITCH_KI 0.0
-#define PID_PITCH_KD 1.0
+#define PID_PITCH_KD 0.0//1.0
 /* DEBUG 没有做yaw的 */
 #define PID_YAW_KP 0.0
 #define PID_YAW_KI 0.0
