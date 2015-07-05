@@ -9,7 +9,10 @@
 #include "LCD.h"
 #include "Motor.h"
 
-#define STARTUP_DUTY 0.0525 // 测试出来的最小电机启动占空比
+// 是对的，是对的
+// TODO 电机启动后不能小于这是值
+// 不过庄总说可以先不做，毕竟有PID，而且逻辑有点复杂
+#define STARTUP_DUTY 0.0526 // 测试出来的最小电机启动占空比
 
 Motor::Motor() {}
 

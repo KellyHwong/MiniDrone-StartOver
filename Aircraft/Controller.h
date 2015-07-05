@@ -12,7 +12,9 @@
  extern "C" {
 #endif
 
-#include "Utilities/Controller.h"
+#include <stdint.h>
+#include "Controller.h"
+#include "PID.h"
 
 class Controller {
   unsigned int interval_unit_; // 调度时间单位，in mS，用来各个输出计算
@@ -20,7 +22,11 @@ class Controller {
   unsigned int interval_ticks_; // 调度间隔，in ticks
   unsigned int interval_counter_; // 调度计数
 private:
+  // 输入的油门 0.05~0.10
+  float throttle_;
   // 调度器的参数
+  float routine_freq_;
+  float scheduler_tick_; // 调度定时器的调度时间间隔，单位S
   float routine_flag_;
   uint8_t routine_flag_int_;
   uint8_t routine_counter_;
@@ -45,8 +51,16 @@ public:
   PID pid_roll;
   PID pid_yaw;
   Controller();
-  void InputParams(float pitch, float row, float yaw);
+  Controller(float routine_freq, float scheduler_tick);
+  inline void SetPoints(float p, float r, float y);
+  inline void SetMeasures(float measured_pitch, float measured_row, float measured_yaw);
   void Routine(void); // 控制器控制例程（用调度器调度）
+  inline uint8_t IsExecuted(void);// 返回给调度器
+  inline float motor1_duty(void);
+  inline float motor2_duty(void);
+  inline float motor3_duty(void);
+  inline float motor4_duty(void);
+  inline void throttle(float th);
 }; // class Stick
 
 #ifdef __cplusplus

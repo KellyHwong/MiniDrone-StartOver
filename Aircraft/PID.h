@@ -11,7 +11,7 @@
  extern "C" {
 #endif
 
-class PID() {
+class PID {
  private:
   // 调度设置
   /* PID类不负责调度设置，调度设置外外部Control类中实现，PID只要负责自己的事情
@@ -42,18 +42,24 @@ class PID() {
     float imin_;
   float dout_; // D路输出
   float out_; // 总输出
-  void EvalOutput(void); // 计算三个输出
+
+  void EvalError(float measured_value);
+  void EvalOut(void);
+  inline void limit_i();
  public:
   PID();
-  // 输入误差
-
+  PID(float Kp, float Ki, float Kd, float dt);
+  PID(float Kp, float Ki, float Kd, float dt, float imin, float imax);
+  inline void Routine(float measured_);
+  void setpid(float Kp, float Ki, float Kd);
+  inline void set_i_limit(float imin, float imax);
+  inline void setpoint(float sp);
   // get输出
-  float pout(); // p端输出
-  float iout(); // i端输出
-  float dout(); // d端输出
-  float out(); // 总输出
-  float iminmax(float min, max); // 设置积分限幅
-}
+  inline float pout(void);
+  inline float iout(void);
+  inline float dout(void);
+  inline float out(void);
+}; // class PID
 
 #ifdef __cplusplus
 }

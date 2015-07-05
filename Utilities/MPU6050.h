@@ -1,4 +1,4 @@
-﻿#ifndef __MPU6050_H
+#ifndef __MPU6050_H
 #define __MPU6050_H
 
 #ifdef __cplusplus
@@ -35,7 +35,10 @@
 
 //****************************
 
-#define	MPU6050_Addr   0xD0	  //定义器件在IIC总线中的从地址,根据ALT  ADDRESS地址引脚不同修改
+// #define	MPU6050_Addr   0xD0	  //定义器件在IIC总线中的从地址,根据ALT  ADDRESS地址引脚不同修改
+
+/* DEBUG */
+#define	MPU6050_Addr   0xA0	  //定义器件在IIC总线中的从地址,根据ALT  ADDRESS地址引脚不同修改
 
 
 void DATA_printf(char *s,short temp_data);

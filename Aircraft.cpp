@@ -5,11 +5,13 @@
 #include "stm32f4_discovery.h"
 
 #include "Aircraft.h"
+#include "Controller.h"
 #include "Delay.h"
 #include "Formatter.h"
 #include "LCD.h"
 #include "Motor.h"
 #include "MPU6050.h"
+#include "PID.h"
 #include "Receiver.h"
 #include "Stick.h"
 #include "Timer.h"
@@ -22,20 +24,21 @@ Timer tim_pitch(PITCH_TIM); // 俯仰（前后） ch2
 Timer tim_yaw(YAW_TIM); // 偏航(水平转动) ch4
 Timer tim_roll(ROLL_TIM); // 翻滚（左右） ch1
 // 4个电机
-Motor motor2;
 Motor motor1;
+Motor motor2;
 Motor motor3;
 Motor motor4;
 // 调度器
 Timer tim_sch(SCH_TIM);
 // 通道捕获器和解释器
+uint16_t Receive_Flag;
 Receiver receiver;
 // PID控制器
-/* TODO
+#ifdef USING_CONTROLLER
 Controller controller;
-*/
+#endif
 // 电机初始化
-uint8_t motor_init_flag = 0;
+uint8_t Aircraft_Init_Flag = 0;
 // 接收缓冲区
 
 uint8_t RxBuffer[RXBUFFLE_SIZE];
@@ -51,42 +54,46 @@ int main(void)
     MPU6050_TEST();
 #endif
 #ifdef _DEBUG_MOTOR
-    Delay(DELAY_1S/2);
-    printf("%f   ",receiver.throttle_.convert_duty_);
+    Delay(DELAY_1S/5);
+    printf("throttle_convert: %f   ",receiver.throttle_.convert_duty_);
 #endif
 #ifdef _DEBUG_STICK
     Delay(DELAY_1S/2);
-    printf("%f   ",tim_yaw.DutyCycle);
-#endif
+    // 油门通道捕获的真实的占空比
+    // throttle、yaw、roll、pitch通道捕获的真实的占空比
 
+    // 四个通道的占空比都是能获得的，并且是正确的
+    //printf("tim_throttle: %f   ",tim_throttle.DutyCycle);
+    //printf("tim_yaw: %f   ",tim_yaw.DutyCycle);
+    //printf("tim_roll: %f   ",tim_roll.DutyCycle);
+    //printf("tim_pitch: %f   ",tim_pitch.DutyCycle);
+
+    // 转换后的值，看看转换是不是对的
+    /* throttle和roll都是对的，pitch和yaw不对，why？
+    printf("receiver.throttle_.convert_duty_: %f   ",receiver.throttle_.convert_duty_);
+    printf("receiver.roll_.convert_duty_: %f   ",receiver.roll_.convert_duty_);
+    */
+    printf("tim_yaw: %f   ",tim_yaw.DutyCycle);
+    printf("tim_pitch: %f   ",tim_pitch.DutyCycle);
+    receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
+    //receiver.update_data(0.05, 0.07,0.08,0.10);
+    printf("receiver.yaw_.convert_duty_: %f   ",receiver.yaw_.convert_duty_);
+    printf("receiver.pitch_.convert_duty_: %f   ",receiver.pitch_.convert_duty_);
+#endif
+    /*
     Delay(DELAY_1S/2);
     printf("%s",RxBuffer);
+    */
 	}
   return -1;
 }
 
 void Aircraft_Init(void) {
-  /* 控制层初始化，方便看所以写在前面 */
-  // 接收机
-  // 数据在2015.7.4凌晨测得
-  receiver.throttle_ = Stick(0.050542,0.09999,0,NEGATIVE_LOGIC);
-  receiver.yaw_ = Stick(0.050795,0.09999,0.75392, POSITIVE_LOGIC_BALANCED);
-  receiver.pitch_ = Stick(0.049995,0.099945,0.074946,POSITIVE_LOGIC_BALANCED);
-  receiver.roll_= Stick(0.049995,0.093991,0.068993,NEGATIVE_LOGIC_BALANCED);
-  // PID控制器
-  /* TODO
-  controller.pid_pitch = PID(,,,);
-  controller.pid_roll = PID(,,,);
-  controller.pid_yaw = PID(,,,);
-  */
-
-  // 底层初始化
+  /* 底层初始化 */
   RxBuffer[0] = '\0';
   firstinputflag = 1;
   RxIndex = 0;
-  // 陀螺仪
-  Init_MPU6050();
-
+  Init_MPU6050(); // 陀螺仪
 
   GPIO_InitTypeDef  GPIO_InitStructure;
   // LCD
@@ -107,9 +114,7 @@ void Aircraft_Init(void) {
   tim_pitch.mode_pwm_input(PITCH_PIN);
   tim_yaw.mode_pwm_input(YAW_PIN);
   tim_roll.mode_pwm_input(ROLL_PIN);
-  // 调度器
-  tim_sch.mode_sch();
-// 油门最高点，听到确认音
+  // 油门最高点，听到确认音
   motor1 = Motor(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN);
   motor2 = Motor(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN);
   motor3 = Motor(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN);
@@ -127,10 +132,10 @@ void Aircraft_Init(void) {
 #ifdef INIT_MOTOR
   Delay(DELAY_1S);
   Delay(DELAY_1S);
-  Delay(DELAY_1S);
+  Delay(DELAY_1S); // 油门最低点确认音，可以起飞
 #endif
-  // 油门最低点确认音，可以起飞
-
+  // 调度器
+  tim_sch.mode_sch();
   // LED4
   RCC_AHB1PeriphClockCmd(LED4_GPIO_CLK, ENABLE);
   GPIO_InitStructure.GPIO_Pin = LED4_PIN;
@@ -140,30 +145,55 @@ void Aircraft_Init(void) {
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStructure);
   GPIO_ResetBits(LED4_GPIO_PORT,LED4_PIN);
-  motor_init_flag = 1;
+
+  /* 控制层初始化 */
+  Receiver_Init(); // 接收机
+  Controller_Init(); // 3通道PID控制器
+
+  /* 全部初始化完成 */
+  Aircraft_Init_Flag = 1;
 }
 
-// 调度器，每次0.5mS
+// 调度器 SCH ，每次0.5mS
 void TIM8_UP_TIM13_IRQHandler(void) {
   TIM_ClearITPendingBit(tim_sch.TIM, TIM_IT_Update);
-  // 接收器更新数据
-  receiver.update_data(tim_throttle.DutyCycle, \
-    tim_yaw.DutyCycle, \
-    tim_pitch.DutyCycle, \
-    tim_roll.DutyCycle);
-
-  if (motor_init_flag) { // 只有当初始化完成才进行调度
-    /*
-    controller.ControlRoutine(); // 3路PID控制
-    */
-#ifdef _DEBUG_MOTOR
-  motor1.set_duty(receiver.throttle_.convert_duty_);
-  motor2.set_duty(receiver.throttle_.convert_duty_);
-  motor3.set_duty(receiver.throttle_.convert_duty_);
-  motor4.set_duty(receiver.throttle_.convert_duty_);
-#endif
+  if (Aircraft_Init_Flag) { // 只有当初始化全部完成才进行调度
+    Receive_Flag ++;
+    if (Receive_Flag == RECEIVE_TICK) {
+      receiver.update_data(tim_throttle.DutyCycle, tim_pitch.DutyCycle, tim_roll.DutyCycle, tim_yaw.DutyCycle);
+      //printf("receiver.yaw_.convert_duty_: %f   ",receiver.yaw_.convert_duty_); // 测试定时器时间准不准用的
+      Receive_Flag = 1;
 #ifdef USING_CONTROLLER
+      // 获取油门大小
+      controller.throttle(receiver.throttle_.convert_duty_); // 输入油门，0.05~0.10
+      /*
+        PITCH，-1~+1，向前为正，向后为负
+        ROLL，-1~+1，向右下为正，向左下为负（很好理解，因为是右手系）
+        YAW，-1~+1，逆时针/向左为正，顺时针/向右为负
+      */
+      controller.SetPoints(receiver.pitch_.convert_duty_,\
+        receiver.roll_.convert_duty_,\
+        receiver.yaw_.convert_duty_); // pitch, roll, yaw
+#endif
+    }
+#ifdef USING_CONTROLLER
+    // TODO，传感器接口还没有写好
+    controller.GetMeasures(0,0,0); // p, r, y
+    controller.ControlRoutine(); // 3路PID控制计算，里面会自动分频
+    if (controller.IsExecuted()) {
+      motor1.set_duty(controller.motor1_duty());
+      motor2.set_duty(controller.motor2_duty());
+      motor3.set_duty(controller.motor3_duty());
+      motor4.set_duty(controller.motor4_duty());
+    }
+#endif
 
+#ifdef _DEBUG_MOTOR
+    // 输入给电机的是转换之后的占空比
+    motor1.set_duty(receiver.throttle_.convert_duty_);
+    motor2.set_duty(receiver.throttle_.convert_duty_);
+    motor3.set_duty(receiver.throttle_.convert_duty_);
+    motor4.set_duty(receiver.throttle_.convert_duty_);
 #endif
   }
 }
@@ -255,6 +285,31 @@ void USART3_IRQHandler(void){
 #endif
     }
 }
+
+void Receiver_Init(void) {
+  Receive_Flag = 1;
+  // 接收机
+  // 数据在2015.7.4晚上更新
+  // 油门，负逻辑，无平衡点
+  receiver.throttle_ = Stick(0.050495,0.099845,0,NEGATIVE_LOGIC);
+  // 偏航，正逻辑，有平衡点，需要归一化（-1~1）
+  receiver.yaw_ = Stick(0.050395,0.09999,0.075446, POSITIVE_LOGIC_BALANCED_UNITARY);
+  // 俯仰，负逻辑，有平衡点，需要归一化
+  receiver.pitch_ = Stick(0.049995,0.099945,0.074993,NEGATIVE_LOGIC_BALANCED_UNITARY);
+  // 翻滚，负逻辑，有平衡点，需要归一化
+  receiver.roll_= Stick(0.049995,0.093991,0.068993,NEGATIVE_LOGIC_BALANCED_UNITARY);
+}
+
+void Controller_Init(void) {
+#ifdef USING_CONTROLLER
+  controller = Controller(CONTROL_FREQ, SCHEDULER_TICK);
+  float dt = 1.0 / CONTROL_FREQ;
+  controller.pid_pitch = PID(PID_PITCH_KP,PID_PITCH_KI,PID_PITCH_KD,dt,-MAX_I_ABS,MAX_I_ABS);
+  controller.pid_roll = PID(PID_ROLL_KP,PID_ROLL_KI,PID_ROLL_KD,dt,-MAX_I_ABS,MAX_I_ABS);
+  controller.pid_yaw = PID(PID_YAW_KP,PID_YAW_KI,PID_YAW_KD,dt,-MAX_I_ABS,MAX_I_ABS);
+#endif
+}
+
 
 #ifdef  USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line)

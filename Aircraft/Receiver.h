@@ -15,8 +15,8 @@ class Receiver {
   Stick pitch_; // 俯仰
   Stick roll_; // 翻滚
   Receiver();
-  void update_data(float throttle);
-  void update_data(float throttle, float yaw, float pitch, float roll);
+  //void update_data(float throttle);
+  void update_data(float t, float p, float r, float y);
 }; // class Stick
 
 #ifdef __cplusplus

@@ -2,13 +2,17 @@
 
 Receiver::Receiver() {}
 
-void Receiver::update_data(float throttle) {
+/*void Receiver::update_data(float throttle) {
   throttle_.get_now_duty(throttle);
-}
+}*/
 
-void Receiver::update_data(float throttle, float yaw, float pitch, float roll) {
-  throttle_.get_now_duty(throttle);
-  yaw_.get_now_duty(yaw);
-  pitch_.get_now_duty(pitch);
-  roll_.get_now_duty(roll);
+// 被调度器调度的
+void Receiver::update_data(float t, float p, float r, float y) {
+  throttle_.data_convert(t);
+  
+  yaw_.data_convert(y);
+  
+  pitch_.data_convert(p);
+  
+  roll_.data_convert(r);
 }
