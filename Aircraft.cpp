@@ -1,8 +1,11 @@
 // 起~飞~
-//#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
+#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
 //#define PRINT_PRY // print the measured pitch row yaw
 //#define PRINT_STICK // 打印转换后的占空比
 #define PRINT_PITCH
+#define PID_PITCH
+#define PID_ROLL
+#define PID_YAW
 
 #include <stdio.h>
 #include <stdint.h>
@@ -69,11 +72,6 @@ int main(void)
 	usart_configuration(USART1, 115200);
   Aircraft_Init();
 
-  myDelay(DELAY_1S);
-  startup_pitch_convert_duty = receiver.pitch_.convert_duty_;
-  startup_roll_convert_duty = receiver.roll_.convert_duty_;
-  startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
-
   uint8_t first_time = 1;
   while (1) {
     /* 读传感器数据在while里面读 这样数据才是最新的 */
@@ -89,8 +87,7 @@ int main(void)
       pitch -= startup_pitch;
       roll -= startup_roll;
       yaw -= startup_yaw;
-      controller.SetMeasures(pitch, roll ,
-        yaw); // p, r, y
+      controller.SetMeasures(pitch, roll, yaw); // p, r, y
 		}
   }
   return -1;
@@ -129,11 +126,12 @@ void USART_Routine(void) {
     if (Fisrt_Print) {
       Fisrt_Print = 0;
       printf("seconds,pitch_setpoint,pitch_measured\r\n");
-      printf("seconds,roll_setpoint,roll_measured\r\n");
+      //printf("seconds,roll_setpoint,roll_measured\r\n");
     }
     printf("%f, %f, %f\r\n", running_seconds, controller.pid_pitch.setpoint(), pitch);
-    printf("%f, %f, %f\r\n", running_seconds, controller.pid_roll.setpoint(), roll);
+    //printf("%f, %f, %f\r\n", running_seconds, controller.pid_roll.setpoint(), roll);
 #endif
+    // USART_Routine
     USART_Flag = 1;
   } // USART_Routine
 }
@@ -203,6 +201,11 @@ void Aircraft_Init(void) {
   Receiver_Init(); // 接收机
   Controller_Init(); // 3通道PID控制器
 
+  myDelay(DELAY_1S);
+  startup_pitch_convert_duty = receiver.pitch_.convert_duty_;
+  startup_roll_convert_duty = receiver.roll_.convert_duty_;
+  startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
+
   /* 全部初始化完成 */
   Aircraft_Init_Flag = 1;
 }
@@ -234,6 +237,19 @@ void TIM8_UP_TIM13_IRQHandler(void) {
     // controller.SetMeasures(pitch,roll,yaw); // p, r, y
     controller.Routine(); // 3路PID控制计算，里面会自动分频
     if (controller.IsExecuted()) {
+      // 这样逻辑清楚一点
+      if (controller.throttle()<MOTOR_STARTUP_DUTY) {
+        motor1.on(0);
+        motor2.on(0);
+        motor3.on(0);
+        motor4.on(0);
+      }
+      else {
+        motor1.on(1);
+        motor2.on(1);
+        motor3.on(1);
+        motor4.on(1);
+      }
       float m1d = controller.motor1_duty();
       float m2d = controller.motor2_duty();
       float m3d = controller.motor3_duty();
@@ -255,6 +271,11 @@ void TIM2_IRQHandler(void) {
 void TIM3_IRQHandler(void) {
   tim_pitch.PWM_Input_Handler();
 }
+  myDelay(DELAY_1S);
+  startup_pitch_convert_duty = receiver.pitch_.convert_duty_;
+  startup_roll_convert_duty = receiver.roll_.convert_duty_;
+  startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
+
 void TIM4_IRQHandler(void) {
   tim_yaw.PWM_Input_Handler();
 }

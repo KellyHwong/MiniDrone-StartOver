@@ -61,6 +61,7 @@ public:
   float motor3_duty(void);
   float motor4_duty(void);
   void throttle(float th);
+  float throttle(void);
 }; // class Stick
 
 #ifdef __cplusplus

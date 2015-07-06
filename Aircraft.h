@@ -23,20 +23,41 @@
 #define RECEIVE_TICK 30 // 30，就是15mS一次
 #define CONTROL_FREQ 114// 控制器调度频率，单位Hz
 // PID参数
-#define PID_ROLL_KP 3.3
-#define PID_ROLL_KI 0.0
-#define PID_ROLL_KD 1.0
-
-#define PID_PITCH_KP 0.0//3.3
+   
+#ifdef PID_PITCH
+#define PID_PITCH_KP 0.33//3.3
 #define PID_PITCH_KI 0.0
-#define PID_PITCH_KD 0.0//1.0
-/* DEBUG 没有做yaw的 */
+#define PID_PITCH_KD 0.1//1.0
+#endif
+#ifdef PID_ROLL
+#define PID_ROLL_KP 0.33//3.3
+#define PID_ROLL_KI 0.0
+#define PID_ROLL_KD 0.1//1.0
+#endif
+#ifdef PID_YAW
+#define PID_YAW_KP 0.33
+#define PID_YAW_KI 0.0
+#define PID_YAW_KD 0.1
+#endif
+
+#ifndef PID_PITCH
+#define PID_PITCH_KP 0.0
+#define PID_PITCH_KI 0.0
+#define PID_PITCH_KD 0.0
+#endif
+#ifndef PID_ROLL
+#define PID_ROLL_KP 0.0
+#define PID_ROLL_KI 0.0
+#define PID_ROLL_KD 0.0
+#endif
+#ifndef PID_YAW
 #define PID_YAW_KP 0.0
 #define PID_YAW_KI 0.0
 #define PID_YAW_KD 0.0
-// 积分限幅，0.025/500*200 == 0.01
-#define MAX_I_ABS 0.01
+#endif
 
+
+#define MAX_I_ABS 0.01 // 积分限幅，0.025/500*200 == 0.01
 
 /* 底层宏定义 */
 #define DELAY_1S 40000000

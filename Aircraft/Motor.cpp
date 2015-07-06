@@ -10,7 +10,7 @@
 #include "Motor.h"
 
 #define MOTOR_MAX_RUNNING_DUTY 0.10
-#define MOTOR_MIN_RUNNING_DUTY 0.05
+#define MOTOR_MIN_DUTY 0.05
 
 // 是对的，是对的
 // TODO 电机启动后不能小于这是值
@@ -24,10 +24,15 @@ Motor::Motor(uint32_t freq, float duty, uint8_t TIM_No, uint8_t CH_No,PinTypedef
 
 // 输入PWM占空比限幅
 float Motor::limit_duty(float duty) {
-  if (duty < MOTOR_MIN_RUNNING_DUTY)
-    duty = MOTOR_MIN_RUNNING_DUTY;
-  if (duty > MOTOR_MAX_RUNNING_DUTY)
-    duty = MOTOR_MAX_RUNNING_DUTY;
+  if (this->on_) { // 打开的话
+    if (duty < MOTOR_STARTUP_DUTY)
+      duty = MOTOR_STARTUP_DUTY;
+    if (duty > MOTOR_MAX_RUNNING_DUTY)
+      duty = MOTOR_MAX_RUNNING_DUTY;
+  }
+  else {
+    duty = MOTOR_MIN_DUTY;
+  }
   return duty;
 }
 
@@ -38,4 +43,12 @@ void Motor::set_duty(float duty) {
 
 float Motor::duty(void) {
   return duty_;
+}
+
+uint8_t Motor::on(void) {
+  return on_;
+}
+
+void Motor::on(uint8_t o) {
+  this->on_ = o;
 }

@@ -98,10 +98,6 @@ void Controller::Routine(void) { // 控制器控制例程（用调度器调度�
     motor2_duty_ = throttle_ - pitch_duty + roll_duty - yaw_duty;
     motor3_duty_ = throttle_ + pitch_duty + roll_duty + yaw_duty;
     motor4_duty_ = throttle_ + pitch_duty - roll_duty - yaw_duty;
-    // 太危险了,如果throttle不够,则认为不启动电机
-    if (throttle_ < MOTOR_STARTUP_DUTY) {
-      motor1_duty_ = motor2_duty_ = motor3_duty_ = motor4_duty_ = MIN_DUTY;
-    }
 
     /* 并把routine_counter置回1 */
     routine_counter_ = 1; // 1 才是执行完了的标志
@@ -120,6 +116,9 @@ float Controller::motor3_duty(void) {
 }
 float Controller::motor4_duty(void) {
   return motor4_duty_;
+}
+float Controller::throttle(void) {
+  return throttle_;
 }
 // setter functions 输入油门
 void Controller::throttle(float th) {
