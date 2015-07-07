@@ -15,7 +15,7 @@ extern u8 flag;
 void usart_x_init(u32 BaudRate);
 void USART3_SendData(unsigned char ch);
 void SendData(signed int A, signed int B, signed int C, signed int D);
-void MPU6050_NVIC_Configuration(void);
+void NVIC_Configuration(IRQn_Type);
 
 void usart_configuration(USART_TypeDef* usartx, uint32_t baudRate);
 void usart_sendByte(USART_TypeDef *usart, u8 val);

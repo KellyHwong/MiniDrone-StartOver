@@ -167,7 +167,7 @@ void USART1_IRQHandler(void)
 	}
 }
 
-void UART4_IRQHandler(void)
+/* void UART4_IRQHandler(void)
 {
 	if(USART_GetFlagStatus(UART4,USART_FLAG_RXNE)==SET)
 	{
@@ -175,7 +175,7 @@ void UART4_IRQHandler(void)
 		USART_ClearITPendingBit(UART4,USART_IT_RXNE);
 
 	}
-}
+} */
 
 #include "usart.h"
 #include "stm32f4xx_gpio.h"
@@ -264,10 +264,10 @@ void SendData(signed int A, signed int B, signed int C, signed int D)
   USART3_SendData(check_byte);
 }
 
-void MPU6050_NVIC_Configuration(void) {
+void NVIC_Configuration(IRQn_Type irqn) {
   	NVIC_InitTypeDef NVIC_InitStructure;//Usart1 NVIC ??
 
-    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannel = irqn;;
 		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0 ;
    	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		//
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ????
