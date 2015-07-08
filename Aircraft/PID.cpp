@@ -96,19 +96,17 @@ inline void PID::limit_i() {
   }
 }
 // getter functions
-float PID::setpoint(void) {
-  return setpoint_;
-}
-float PID::pout(void) {
-  return pout_;
-}
-float PID::iout(void) {
-  return iout_;
-}
+float PID::setpoint(void) { return setpoint_; }
+float PID::pout(void) { return pout_; }
+float PID::iout(void) { return iout_; }
+float PID::dout(void) { return dout_; }
+float PID::out(void) { return out_; }
 
-float PID::dout(void) {
-  return dout_;
-}
-float PID::out(void) {
-  return out_;
-}
+// 设置PID参数
+void PID::Kp(float p) { Kp_ = p; }
+void PID::Ki(float i) { Ki_ = i; }
+void PID::Kd(float d) { Kd_ = d; }
+// 读取PID参数
+float PID::Kp(void) { return Kp_; }
+float PID::Ki(void) { return Ki_; }
+float PID::Kd(void) { return Kd_; }

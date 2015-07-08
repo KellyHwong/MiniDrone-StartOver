@@ -60,6 +60,14 @@ class PID {
   float iout(void);
   float dout(void);
   float out(void);
+  // 设置PID参数
+  void Kp(float p);
+  void Ki(float i);
+  void Kd(float d);
+  // 读取PID参数
+  float Kp(void);
+  float Ki(void);
+  float Kd(void);
 }; // class PID
 
 #ifdef __cplusplus

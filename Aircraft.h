@@ -4,6 +4,8 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
+   
+#include <stdint.h>
 // define configs，宏定义设置
 
 //#define USING_CONTROLLER PID控制层写好后反注释这个
@@ -97,7 +99,7 @@
 
 /* 这个宏定义很多文件都用到了，不要随便改！！！ */
 #define SCHEDULER_TICK 0.0005 // 调度器时间间隔，单位S
-
+void adjust_p(uint8_t value);
 void Aircraft_Init(void);
 void Controller_Init(void);
 void Receiver_Init(void);

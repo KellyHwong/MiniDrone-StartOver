@@ -12,6 +12,7 @@
 #include "stm32f4_discovery.h"
 
 #include "Aircraft.h"
+#include "BluetoothCmd.h"
 #include "Controller.h"
 #include "Formatter.h"
 #include "LCD.h"
@@ -60,6 +61,8 @@ uint8_t RxBufferReady;
 // 运行时间计时
 uint32_t running_ticks;
 float running_seconds;
+// 字符串命令解释/执行器
+BluetoothCmd bluetoothcmd(); // 传函数地址
 
 int main(void)
 {
@@ -158,6 +161,7 @@ void Aircraft_Init(void) {
   startup_roll_convert_duty = receiver.roll_.convert_duty_;
   startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
 
+  bluetoothcmd = BluetoothCmd(&adjust_p);
   /* 全部初始化完成 */
   Aircraft_Init_Flag = 1;
 }
@@ -258,13 +262,12 @@ void UART4_IRQHandler(void) {
         }
         else{
           /* 0x0A 是我的帧结尾, 即回车, 0xAA 是蓝牙串口协议的帧结尾 */
-          if ( (ch == 0xAA)&&(RxIndex==6) ) { // 6+1 帧长度 last ver: (ch == 0x0A) 
+          if ( (ch == 0xAA)&&(RxIndex==6) ) { // 6+1 帧长度 last ver: (ch == 0x0A)
             RxBuffer[RxIndex] = '\0';
             firstinputflag = 1;	// 此次组装结束，准备下次组装
             RxBufferReady = 1; // 准备好了
           }
           else{
-
             RxBuffer[RxIndex] = ch;
             RxIndex++; // 继续读下一个
             /* 溢出判断 */
@@ -306,6 +309,19 @@ void Controller_Init(void) {
   controller.pid_yaw = PID(PID_YAW_KP,PID_YAW_KI,PID_YAW_KD,dt,-MAX_I_ABS,MAX_I_ABS);
 }
 
+/* 程序结构还是差了点, 因为把controller作为全局变量放在Aircraft里面
+*  调节pitch的PID参数 (现在是调P参数)
+* @params: value: the value in the string protocol
+*
+*/
+#define WITCH_PID_TO_ADJUST pid_pitch // 你要干哪个 PID?
+void adjust_p(uint8_t value) {
+  float min = 0;  // 参数最小值
+  float max = 10; // 参数最大值
+  float value_f = (float)value; // 0~255 转浮点数
+  value_f = value_f/(255-0)*(max-min); // scaling
+  controller.WITCH_PID_TO_ADJUST.Kp(value_f); // 调用PID的参数设置接口
+}
 
 #ifdef  USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line)
