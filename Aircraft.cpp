@@ -62,7 +62,8 @@ uint8_t RxBufferReady;
 uint32_t running_ticks;
 float running_seconds;
 // 字符串命令解释/执行器
-BluetoothCmd bluetoothcmd(); // 传函数地址
+// BluetoothCmd bluetoothcmd(); // 一个傻逼的错误
+BluetoothCmd bluetoothcmd; // 传函数地址
 
 int main(void)
 {
@@ -98,8 +99,9 @@ int main(void)
 uint16_t USART_Flag = 0;
 uint8_t Fisrt_Print = 1;
 
-#define PRINTF_TICKS 200// 0.5mS per tick
-
+#define PRINTF_TICKS 20// 0.5mS per tick
+/* 100mS打印一次 */
+/* 10mS响应一次命令, 可能实时性差一点 */
 void USART_Routine(void) {
   USART_Flag ++;
   if (USART_Flag==PRINTF_TICKS) { // USART_Routine
@@ -161,7 +163,7 @@ void Aircraft_Init(void) {
   startup_roll_convert_duty = receiver.roll_.convert_duty_;
   startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
 
-  bluetoothcmd = BluetoothCmd(&adjust_p);
+  bluetoothcmd.func1_ptr_ = &adjust_p;
   /* 全部初始化完成 */
   Aircraft_Init_Flag = 1;
 }
@@ -266,6 +268,8 @@ void UART4_IRQHandler(void) {
             RxBuffer[RxIndex] = '\0';
             firstinputflag = 1;	// 此次组装结束，准备下次组装
             RxBufferReady = 1; // 准备好了
+            /* 立即执行，保证实时性 */
+            bluetoothcmd.Execute(RxBuffer); // 命令解释器/执行器
           }
           else{
             RxBuffer[RxIndex] = ch;
@@ -319,7 +323,7 @@ void adjust_p(uint8_t value) {
   float min = 0;  // 参数最小值
   float max = 10; // 参数最大值
   float value_f = (float)value; // 0~255 转浮点数
-  value_f = value_f/(255-0)*(max-min); // scaling
+  value_f = value_f/(255.0-0)*(max-min); // scaling
   controller.WITCH_PID_TO_ADJUST.Kp(value_f); // 调用PID的参数设置接口
 }
 

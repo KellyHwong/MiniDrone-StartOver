@@ -533,6 +533,11 @@
               <FileType>8</FileType>
               <FilePath>.\Utilities\AsciiLib.cpp</FilePath>
             </File>
+            <File>
+              <FileName>BluetoothCmd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Utilities\BluetoothCmd.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

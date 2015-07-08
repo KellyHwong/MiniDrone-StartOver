@@ -6,9 +6,10 @@ BluetoothCmd::BluetoothCmd() {
 }
 
 // 给动作执行接口 (函数指针) 赋值
-BluetoothCmd::BluetoothCmd(void(*ptr)(uint8_t value)) {
-  func1_ptr_ = ptr;
-}
+/* 放弃这个构造器了，喵了个咪，直接成员赋值算了(不管特么的封装性了（╯‵□′）╯︵┴─┴) */
+/*BluetoothCmd::BluetoothCmd(void(&ptr)(uint8_t)) { // 传引用
+  func1_ptr_ = &ptr; // 再传地址
+}*/
 
 // 直接调用这个, 解释并执行
 void BluetoothCmd::Execute(uint8_t* cmd_string) {
@@ -34,7 +35,7 @@ uint8_t BluetoothCmd::CheckString(uint8_t* cmd_string) {
   uint8_t checksum = Checksum(cmd_string,5);
   if(checksum!=cmd_checksum_) return 0; // 校验和有没有出错
   else {
-    if((cmd_begin_[0]==0xA5)&&(cmd_begin_[1]==0xA5)){
+    if((cmd_begin_[0]==0xA5)&&(cmd_begin_[1]==0x5A)){
       if(cmd_group_sel_==0x05) {// 检查组选
         if(cmd_func_sel_ == 0xF1) return 1; // 第一个功能, 调PID的P参数
       }
