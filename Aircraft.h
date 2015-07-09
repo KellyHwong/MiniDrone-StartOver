@@ -4,7 +4,7 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-   
+
 #include <stdint.h>
 // define configs，宏定义设置
 
@@ -24,8 +24,8 @@
 /* 应用层和控制层宏定义 */
 #define RECEIVE_TICK 30 // 30，就是15mS一次
 #define CONTROL_FREQ 114// 控制器调度频率，单位Hz
-// PID参数
-   
+
+/* 确定三个 PID 要不要使用, 以及设定初值的宏定义 */
 #ifdef PID_PITCH
 #define PID_PITCH_KP 0.33//3.3
 #define PID_PITCH_KI 0.0
@@ -100,6 +100,8 @@
 /* 这个宏定义很多文件都用到了，不要随便改！！！ */
 #define SCHEDULER_TICK 0.0005 // 调度器时间间隔，单位S
 void adjust_p(uint8_t value);
+void adjust_i(uint8_t value);
+void adjust_d(uint8_t value);
 void Aircraft_Init(void);
 void Controller_Init(void);
 void Receiver_Init(void);

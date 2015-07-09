@@ -33,6 +33,8 @@ public:
   /* 使用数字命名很不规范! 现在先实现 */
   /* 把它 public 了 */
   void(*func1_ptr_)(uint8_t); // 函数指针, 执行动作的接口
+  void(*func2_ptr_)(uint8_t); // 函数指针, 执行动作的接口
+  void(*func3_ptr_)(uint8_t); // 函数指针, 执行动作的接口
 }; // class BluetoothCmd
 
 #ifdef __cplusplus

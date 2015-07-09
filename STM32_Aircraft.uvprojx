@@ -524,16 +524,6 @@
           <GroupName>Utilities</GroupName>
           <Files>
             <File>
-              <FileName>LCD.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Utilities\LCD.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>AsciiLib.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Utilities\AsciiLib.cpp</FilePath>
-            </File>
-            <File>
               <FileName>BluetoothCmd.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Utilities\BluetoothCmd.cpp</FilePath>
@@ -543,11 +533,6 @@
         <Group>
           <GroupName>Misc</GroupName>
           <Files>
-            <File>
-              <FileName>Formatter.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Misc\Formatter.cpp</FilePath>
-            </File>
             <File>
               <FileName>myDelay.cpp</FileName>
               <FileType>8</FileType>

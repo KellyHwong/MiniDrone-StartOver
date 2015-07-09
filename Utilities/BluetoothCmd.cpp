@@ -15,11 +15,20 @@ BluetoothCmd::BluetoothCmd() {
 void BluetoothCmd::Execute(uint8_t* cmd_string) {
   switch(this->CheckString(cmd_string)){
     case(1):{
-      (*func1_ptr_)(cmd_value_); // 执行第一个功能(注意要传入参数)
+      (*func1_ptr_)(cmd_value_); // 执行第一个功能
+      break;
+    }
+    case(2):{
+      (*func2_ptr_)(cmd_value_); // 执行第二个功能
+      break;
+    }
+    case(3):{
+      (*func3_ptr_)(cmd_value_); // 执行第三个功能
+      break;
     }
     default:{
       // do nothing
-
+      break;
     }
   }
 }
@@ -37,7 +46,11 @@ uint8_t BluetoothCmd::CheckString(uint8_t* cmd_string) {
   else {
     if((cmd_begin_[0]==0xA5)&&(cmd_begin_[1]==0x5A)){
       if(cmd_group_sel_==0x05) {// 检查组选
-        if(cmd_func_sel_ == 0xF1) return 1; // 第一个功能, 调PID的P参数
+        switch(cmd_func_sel_){
+          case(0xF1):{ return 1; }
+          case(0xF2):{ return 2; }
+          case(0xF3):{ return 3; }
+        }
       }
       else return 0;
     } // 检查帧头两个字节

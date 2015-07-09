@@ -1,9 +1,18 @@
 // 起~飞~
-//#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
+#define INIT_MOTOR // 就是初始化电机，等待几秒的那些东西，试飞或者调试电机的时候需要反注释这个
+ 
+#define WITCH_PID_TO_ADJUST pid_pitch // 你要干哪个 PID?
 
 #define PID_PITCH
-#define PID_ROLL
-#define PID_YAW
+//#define PID_ROLL
+//#define PID_YAW
+
+#define MAX_P 10.0
+#define MIN_P 0.0
+#define MAX_I 10.0
+#define MIN_I 0.0
+#define MAX_D 10.0
+#define MIN_D 0.0
 
 #include <stdio.h>
 #include <stdint.h>
@@ -164,6 +173,8 @@ void Aircraft_Init(void) {
   startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
 
   bluetoothcmd.func1_ptr_ = &adjust_p;
+  bluetoothcmd.func2_ptr_ = &adjust_i;
+  bluetoothcmd.func3_ptr_ = &adjust_d;
   /* 全部初始化完成 */
   Aircraft_Init_Flag = 1;
 }
@@ -316,15 +327,29 @@ void Controller_Init(void) {
 /* 程序结构还是差了点, 因为把controller作为全局变量放在Aircraft里面
 *  调节pitch的PID参数 (现在是调P参数)
 * @params: value: the value in the string protocol
-*
 */
-#define WITCH_PID_TO_ADJUST pid_pitch // 你要干哪个 PID?
 void adjust_p(uint8_t value) {
-  float min = 0;  // 参数最小值
-  float max = 10; // 参数最大值
+  float min = MIN_P;  // 参数最小值
+  float max = MAX_P; // 参数最大值
   float value_f = (float)value; // 0~255 转浮点数
-  value_f = value_f/(255.0-0)*(max-min); // scaling
-  controller.WITCH_PID_TO_ADJUST.Kp(value_f); // 调用PID的参数设置接口
+  value_f = value_f/(255.0-0)*(max-min)+min; // scaling
+  controller.WITCH_PID_TO_ADJUST.Kp(value_f); // 调用PID的P参数
+}
+
+void adjust_i(uint8_t value) {
+  float min = MIN_I;  // 参数最小值
+  float max = MAX_I; // 参数最大值
+  float value_f = (float)value; // 0~255 转浮点数
+  value_f = value_f/(255.0-0)*(max-min)+min; // scaling
+  controller.WITCH_PID_TO_ADJUST.Ki(value_f); // 调用PID的I参数
+}
+
+void adjust_d(uint8_t value) {
+  float min = MIN_D;  // 参数最小值
+  float max = MAX_D; // 参数最大值
+  float value_f = (float)value; // 0~255 转浮点数
+  value_f = value_f/(255.0-0)*(max-min)+min; // scaling
+  controller.WITCH_PID_TO_ADJUST.Kd(value_f); // 调用PID的D参数
 }
 
 #ifdef  USE_FULL_ASSERT
