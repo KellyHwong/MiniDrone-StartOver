@@ -24,12 +24,12 @@ private:
   uint8_t cmd_value_;
   uint8_t cmd_checksum_;
   uint8_t CheckString(uint8_t* cmd_string);
-  uint8_t Checksum(uint8_t* str, uint8_t n);
-
+ 
 public:
   BluetoothCmd();
   //BluetoothCmd(void(&ptr)(uint8_t));
   void Execute(uint8_t* cmd_string);
+  uint8_t Checksum(uint8_t* str, uint8_t n);
   /* 使用数字命名很不规范! 现在先实现 */
   /* 把它 public 了 */
   void(*func1_ptr_)(uint8_t); // 函数指针, 执行动作的接口

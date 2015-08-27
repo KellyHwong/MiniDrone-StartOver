@@ -115,10 +115,13 @@ void USART_Routine(void) {
   USART_Flag ++;
   if (USART_Flag==PRINTF_TICKS) { // USART_Routine
     /* 在这里写下需要打印的东西 */
-    if (RxBufferReady==1) {
-      printf("%s\r\n", RxBuffer); /* USART Received: 我要看到是16进制, 这句话不要 */
+    printf("testtesttest\r\n");
+    
+    if (RxBufferReady==1) { // 接收和处理了字符串
+      printf("Kd set as: %f", controller.WITCH_PID_TO_ADJUST.Kd()); /* USART Received: 我要看到是16进制, 这句话不要 */
       RxBufferReady = 0;
-    }
+    } // 接收和处理了字符串
+    
     // USART_Routine
     USART_Flag = 1;
   } // USART_Routine
@@ -136,16 +139,16 @@ void Aircraft_Init(void) {
   tim_pitch.mode_pwm_input(PITCH_PIN);
   tim_yaw.mode_pwm_input(YAW_PIN);
   tim_roll.mode_pwm_input(ROLL_PIN);
-  // 油门最高点，听到确认音
-  motor1 = Motor(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN);
-  motor2 = Motor(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN);
-  motor3 = Motor(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN);
-  motor4 = Motor(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN);
   // 电调接上电池，等待2S
 #ifdef INIT_MOTOR
   myDelay(DELAY_1S);
   myDelay(DELAY_1S);
 #endif
+  // 油门最高点，听到确认音
+  motor1 = Motor(PWM_FREQ,MAX_DUTY,MOTOR1_PWM_TIM,MOTOR1_PWM_CH,MOTOR1_PWM_PIN);
+  motor2 = Motor(PWM_FREQ,MAX_DUTY,MOTOR2_PWM_TIM,MOTOR2_PWM_CH,MOTOR2_PWM_PIN);
+  motor3 = Motor(PWM_FREQ,MAX_DUTY,MOTOR3_PWM_TIM,MOTOR3_PWM_CH,MOTOR3_PWM_PIN);
+  motor4 = Motor(PWM_FREQ,MAX_DUTY,MOTOR4_PWM_TIM,MOTOR4_PWM_CH,MOTOR4_PWM_PIN);
   // 油门推到最低，等待1S
   motor1.set_duty(MIN_DUTY);
   motor2.set_duty(MIN_DUTY);
@@ -168,7 +171,7 @@ void Aircraft_Init(void) {
 #ifdef INIT_MOTOR
   myDelay(DELAY_1S*4); // 等待足够长的时间，确认初始各个角度值（用于校准）
 #endif
-  startup_pitch_convert_duty = receiver.pitch_.convert_duty_;
+  startup_pitch_convert_duty = receiver.pitch_.convert_duty_; // 前面暂停了足够的时间，PWM捕获中断应该进行了很多次了
   startup_roll_convert_duty = receiver.roll_.convert_duty_;
   startup_yaw_convert_duty = receiver.yaw_.convert_duty_;
 
@@ -334,6 +337,7 @@ void adjust_p(uint8_t value) {
   float value_f = (float)value; // 0~255 转浮点数
   value_f = value_f/(255.0-0)*(max-min)+min; // scaling
   controller.WITCH_PID_TO_ADJUST.Kp(value_f); // 调用PID的P参数
+  
 }
 
 void adjust_i(uint8_t value) {

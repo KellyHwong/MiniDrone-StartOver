@@ -20,18 +20,19 @@ Motor::Motor() {}
 
 Motor::Motor(uint32_t freq, float duty, uint8_t TIM_No, uint8_t CH_No,PinTypedef pin) {
   pwm_ = PWM(freq, duty, TIM_No, CH_No, pin);
+  on_ = 0; // 关闭电机
 }
 
 // 输入PWM占空比限幅
 float Motor::limit_duty(float duty) {
   if (this->on_) { // 打开的话
-    if (duty < MOTOR_STARTUP_DUTY)
+    if (duty < MOTOR_STARTUP_DUTY) // 则不低于电机停转的最小占空比
       duty = MOTOR_STARTUP_DUTY;
     if (duty > MOTOR_MAX_RUNNING_DUTY)
       duty = MOTOR_MAX_RUNNING_DUTY;
   }
   else {
-    duty = MOTOR_MIN_DUTY;
+    duty = MOTOR_MIN_DUTY; // 没打开就一直保持最低占空比
   }
   return duty;
 }
