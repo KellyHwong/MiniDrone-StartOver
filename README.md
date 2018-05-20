@@ -1,4 +1,12 @@
-# STM32_Aircraft
+# Renamed project to MiniDrone-Startover
+
+## 可能的Reference  
+手掌大小的无人机  
+淘宝上的地摊货无人机  
+etc  
+想到再说  
+
+Original STM32_Aircraft
 STM32，四旋翼飞行器
 
 没什么好说的，赶紧做吧.
