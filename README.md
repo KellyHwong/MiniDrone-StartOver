@@ -12,3 +12,6 @@ STM32，四旋翼飞行器
 ## [试飞记录](https://www.youtube.com/watch?v=cQ1iSv82Aq8)
 
 
+# 2018年05月20日11:27:05
+计划写个船新的项目架构书Proposal  
+众包编程  
